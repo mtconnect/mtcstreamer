@@ -438,7 +438,10 @@ namespace MTConnect
                     ASCIIEncoding encoding = new ASCIIEncoding();
                     boundary = encoding.GetBytes("\r\n--" + contentType.Substring(contentType.IndexOf("boundary=", 0) + 9));
                     boundaryLen = boundary.Length;
-                    int headerLen = "Content-type: text/xml\r\nContent-length: 123\r\n".Length;
+
+                    // This is just an example header to see if we should bother checking for a 
+                    // new chunk after we finish with what we have processed.
+                    int headerLen = "Content-type: text/xml\r\nContent-length: 123\r\n\r\n".Length;
 
                     // get response stream
                     stream = responce.GetResponseStream();
@@ -467,8 +470,9 @@ namespace MTConnect
 
                         // increment received bytes counter
                         bytesReceived += read;
+                        bool needMoreData = false;
 
-                        do
+                        while (!needMoreData)
                         {
                             if (!body)
                             {
@@ -493,6 +497,11 @@ namespace MTConnect
                                     pos = start;
                                     todo = offset - pos;
                                     body = true;
+                                }
+                                else
+                                {
+                                    // Get some more data...
+                                    needMoreData = true;
                                 }
                             }
 
@@ -535,14 +544,21 @@ namespace MTConnect
                                     pos = 0;
                                     body = false;
                                     partLength = 0;
+                                    needMoreData = todo < headerLen;
                                 }
                                 else if (partLength > 0)
                                 {
                                     MessageBox.Show("Possible Framing Error", "We should always find the boundary",
                                                     MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                    needMoreData = true;
                                 }
                             }
-                        } while (!body && todo > headerLen);
+                            else
+                            {
+                                // Don't have enough data
+                                needMoreData = true;
+                            }
+                        }
                     } 
                 }
                 catch (WebException exception)
