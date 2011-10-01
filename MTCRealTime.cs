@@ -533,9 +533,7 @@ namespace MTConnect
                                     {
                                         // If we know the part length, then the boundry should be following.
                                         // This is not a major problem but does indicate a framing issue
-                                        MessageBox.Show("Possible Framing Error", "Ignore for now",
-                                                        MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
+                                        Console.WriteLine("Possible Framing Error, boundary not at end of content-length");
                                     }
 
                                     pos = stop;
@@ -565,8 +563,7 @@ namespace MTConnect
                                 }
                                 else if (partLength > 0)
                                 {
-                                    MessageBox.Show("Possible Framing Error", "We should always find the boundary",
-                                                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                    Console.WriteLine("Possible Framing Error, we should always find the boundary");
                                     needMoreData = true;
                                 }
                             }
