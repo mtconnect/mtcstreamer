@@ -470,10 +470,12 @@ namespace MTConnect
 
                         // increment received bytes counter
                         bytesReceived += read;
-                        bool needMoreData = false;
+                        bool needMoreData;
 
-                        while (!needMoreData)
+                        do
                         {
+                            // Always assume we need more data...
+                            needMoreData = true;
                             if (!body)
                             {
                                 start = ByteArrayUtils.Find(buffer, mimeBoundry, pos, todo);
@@ -498,11 +500,6 @@ namespace MTConnect
                                     todo = offset - pos;
                                     body = true;
                                 }
-                                else
-                                {
-                                    // Get some more data...
-                                    needMoreData = true;
-                                }
                             }
 
                             if (body && (partLength > 0 && todo >= partLength) ||
@@ -525,7 +522,7 @@ namespace MTConnect
                                     // no content length given.
                                     stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
                                 }
-                                
+
                                 if (stop != -1)
                                 {
                                     // Add two for the \r\n at the end before the boundary.
@@ -564,15 +561,9 @@ namespace MTConnect
                                 else if (partLength > 0)
                                 {
                                     Console.WriteLine("Possible Framing Error, we should always find the boundary");
-                                    needMoreData = true;
                                 }
                             }
-                            else
-                            {
-                                // Don't have enough data
-                                needMoreData = true;
-                            }
-                        }
+                         } while (!needMoreData);
                     } 
                 }
                 catch (WebException exception)
