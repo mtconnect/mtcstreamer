@@ -508,7 +508,15 @@ namespace MTConnect
                             if (body && (partLength > 0 && todo >= partLength) ||
                                         (partLength <= 0 && todo >= boundaryLen))
                             {
-                                stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
+                                // Boundary should be right at the end, lets check there first...
+                                // Remember to skip back two characters for the final \r\n
+                                int end = pos + (partLength - boundaryLen) - 2;
+                                stop = ByteArrayUtils.Find(buffer, boundary, end, todo - (end - pos));
+
+                                // OK, didn't find it, lets scan from the beginning. We have a framing
+                                // error, but lets try to recover.
+                                if (stop == -1)
+                                    stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
                                 if (stop != -1)
                                 {
                                     // Add two for the \r\n at the end before the boundary.
