@@ -514,17 +514,18 @@ namespace MTConnect
                                 {
                                     int end = pos + (partLength - boundaryLen) - 2;
                                     stop = ByteArrayUtils.Find(buffer, boundary, end, todo - (end - pos));
+
+                                    // OK, didn't find it, lets scan from the beginning. We have a framing
+                                    // error, but lets try to recover.
+                                    if (stop == -1)
+                                        stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
                                 }
                                 else
                                 {
-                                    stop = -1;
-                                }
-
-                                // OK, didn't find it, lets scan from the beginning. We have a framing
-                                // error, but lets try to recover. This will also happen if there was
-                                // no content length given.
-                                if (stop == -1)
+                                    // no content length given.
                                     stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
+                                }
+                                
                                 if (stop != -1)
                                 {
                                     // Add two for the \r\n at the end before the boundary.
