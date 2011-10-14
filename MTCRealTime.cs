@@ -451,13 +451,13 @@ namespace MTConnect
                     // loop
                     while ((!stopEvent.WaitOne(0, true)) && (!reloadEvent.WaitOne(0, true)))
                     {
-                        // check total read
+                        // check total read and make sure we don't overflow
                         if (offset > bufSize - readSize)
                             offset = pos = todo = 0;
 
                         int readLength;
-                        if (body && partLength > 0 && partLength - todo > readSize)
-                            readLength = partLength - todo;
+                        if (bufSize - offset < readSize)
+                            readLength = bufSize - offset;
                         else
                             readLength = readSize;
 
@@ -491,7 +491,7 @@ namespace MTConnect
                                     {
                                         string[] headerParts = s.Split(':');
                                         if (headerParts[0].ToLower() == "content-length")
-                                            partLength = Int32.Parse(headerParts[1]) + boundaryLen;
+                                            partLength = Int32.Parse(headerParts[1]); // +boundaryLen;
                                     }
 
                                     // found XML start and skip leading <cr><nl><cr><nl>
@@ -509,14 +509,8 @@ namespace MTConnect
                                 // Remember to skip back two characters for the final \r\n
                                 if (partLength > 0)
                                 {
-                                    int end = pos + (partLength - boundaryLen) - 2;
-                                    stop = ByteArrayUtils.Find(buffer, boundary, end, todo - (end - pos));
-
-                                    // OK, didn't find it, lets scan from the beginning. We have a framing
-                                    // error, but lets try to recover.
-                                    if (stop == -1)
-                                        stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
-                                }
+                                    stop = start + partLength - 2;
+                               }
                                 else
                                 {
                                     // no content length given.
@@ -526,7 +520,7 @@ namespace MTConnect
                                 if (stop != -1)
                                 {
                                     // Add two for the \r\n at the end before the boundary.
-                                    if (partLength > 0 && (stop - start + 2) != (partLength - boundaryLen))
+                                    if (partLength > 0 && (stop - start + 2) != partLength)
                                     {
                                         // If we know the part length, then the boundry should be following.
                                         // This is not a major problem but does indicate a framing issue
@@ -548,7 +542,7 @@ namespace MTConnect
                                     }
 
                                     // shift array
-                                    pos = stop + boundaryLen;
+                                    pos = stop;
                                     todo = offset - pos;
                                     Array.Copy(buffer, pos, buffer, 0, todo);
 
