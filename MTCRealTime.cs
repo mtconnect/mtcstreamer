@@ -393,8 +393,8 @@ namespace MTConnect
                 int boundaryLen;
 
                 // read amounts and positions
-                int read, todo = 0, offset = 0, pos = 0;
-                int start = 0, stop = 0;
+                int read, count = 0;
+                int start = 0, partLength = 0;
                 bool body = false;
 
                 // align
@@ -422,7 +422,6 @@ namespace MTConnect
                     {
                         // Notify of error...
                         /// ErrorEventArgs handler...
-
                         request.Abort();
                         request = null;
                         responce.Close();
@@ -436,37 +435,32 @@ namespace MTConnect
 
                     // get boundary
                     ASCIIEncoding encoding = new ASCIIEncoding();
-                    boundary = encoding.GetBytes("\r\n--" + contentType.Substring(contentType.IndexOf("boundary=", 0) + 9));
+                    boundary = encoding.GetBytes("--" + contentType.Substring(contentType.IndexOf("boundary=", 0) + 9));
                     boundaryLen = boundary.Length;
 
                     // This is just an example header to see if we should bother checking for a 
                     // new chunk after we finish with what we have processed.
-                    int headerLen = "Content-type: text/xml\r\nContent-length: 123\r\n\r\n".Length;
+                    int headerLen = "Content-type: text/xml\r\nContent-length: 12345\r\n\r\n".Length;
 
                     // get response stream
                     stream = responce.GetResponseStream();
-                    int partLength = 0;
-                    pos = boundaryLen;
+ 
 
                     // loop
                     while ((!stopEvent.WaitOne(0, true)) && (!reloadEvent.WaitOne(0, true)))
                     {
-                        // check total read and make sure we don't overflow
-                        if (offset > bufSize - readSize)
-                            offset = pos = todo = 0;
-
+                        // Read the remaining size of the buffer or our standard chunk size.
                         int readLength;
-                        if (bufSize - offset < readSize)
-                            readLength = bufSize - offset;
+                        if (bufSize - count < readSize)
+                            readLength = bufSize - count;
                         else
                             readLength = readSize;
 
                         // read next portion from stream
-                        if ((read = stream.Read(buffer, offset, readLength)) == 0)
+                        if ((read = stream.Read(buffer, count, readLength)) == 0)
                             throw new ApplicationException();
 
-                        offset += read;
-                        todo += read;
+                        count += read;
 
                         // increment received bytes counter
                         bytesReceived += read;
@@ -476,89 +470,69 @@ namespace MTConnect
                         {
                             // Always assume we need more data...
                             needMoreData = true;
-                            if (!body)
+                            if (!body && count - start > headerLen)
                             {
-                                start = ByteArrayUtils.Find(buffer, mimeBoundry, pos, todo);
-                                if (start != -1)
+                                // Find the mime separator
+                                int head = ByteArrayUtils.Find(buffer, boundary, start, count - start);
+                                if (head == -1)
                                 {
-                                    // Parse the headers
-                                    string header = encoding.GetString(buffer, pos, start - pos);
-                                    string[] headers = header.Split('\n');
-
-                                    // Find the part length.
-                                    partLength = 0;
-                                    foreach (string s in headers)
-                                    {
-                                        string[] headerParts = s.Split(':');
-                                        if (headerParts[0].ToLower() == "content-length")
-                                            partLength = Int32.Parse(headerParts[1]); // +boundaryLen;
-                                    }
-
-                                    // found XML start and skip leading <cr><nl><cr><nl>
-                                    start += 4;
-                                    pos = start;
-                                    todo = offset - pos;
-                                    body = true;
+                                    Console.WriteLine("Framing error, boundary not found\n");
                                 }
-                            }
-
-                            if (body && (partLength > 0 && todo >= partLength) ||
-                                        (partLength <= 0 && todo >= boundaryLen))
-                            {
-                                // Boundary should be right at the end, lets check there first...
-                                // Remember to skip back two characters for the final \r\n
-                                if (partLength > 0)
-                                {
-                                    stop = start + partLength - 2;
-                               }
                                 else
                                 {
-                                    // no content length given.
-                                    stop = ByteArrayUtils.Find(buffer, boundary, pos, todo);
-                                }
-
-                                if (stop != -1)
-                                {
-                                    // Add two for the \r\n at the end before the boundary.
-                                    if (partLength > 0 && (stop - start + 2) != partLength)
+                                    start = head + boundaryLen + 2;
+                                    int ind = ByteArrayUtils.Find(buffer, mimeBoundry, start, count - start);
+                                    if (ind != -1)
                                     {
-                                        // If we know the part length, then the boundry should be following.
-                                        // This is not a major problem but does indicate a framing issue
-                                        Console.WriteLine("Possible Framing Error, boundary not at end of content-length");
+                                        // Parse the headers
+                                        string header = encoding.GetString(buffer, start, ind - start);
+                                        string[] headers = header.Split('\n');
+
+                                        // Find the part length.
+                                        partLength = 0;
+                                        foreach (string s in headers)
+                                        {
+                                            string[] headerParts = s.Split(':');
+                                            if (headerParts[0].ToLower() == "content-length")
+                                                partLength = Int32.Parse(headerParts[1]); // +boundaryLen;
+                                        }
+
+                                        // found XML start and skip leading <cr><nl><cr><nl>
+                                        start = ind + 4;
+                                        body = true;
                                     }
-
-                                    pos = stop;
-                                    todo = offset - pos;
-
-                                    // increment frames counter
-                                    framesReceived++;
-
-                                    // notify
-                                    if (DataEvent != null)
-                                    {
-                                        string document = encoding.GetString(buffer, start, stop - start);
-                                        // notify client
-                                        DataEvent(this, new RealTimeEventArgs(document));
-                                    }
-
-                                    // shift array
-                                    pos = stop;
-                                    todo = offset - pos;
-                                    Array.Copy(buffer, pos, buffer, 0, todo);
-
-                                    offset = todo;
-                                    pos = 0;
-                                    body = false;
-                                    partLength = 0;
-                                    needMoreData = todo < headerLen;
-                                }
-                                else if (partLength > 0)
-                                {
-                                    Console.WriteLine("Possible Framing Error, we should always find the boundary");
                                 }
                             }
+
+                            if (body && partLength > 0 && (count - start) >= partLength)
+                            {
+                                // increment frames counter
+                                framesReceived++;
+
+                                // notify
+                                if (DataEvent != null)
+                                {
+                                    // Boundary should be right at the end, lets check there first...
+                                    // Remember to skip back two characters for the final \r\n
+                                    string document = encoding.GetString(buffer, start, partLength - 2);
+
+                                    // notify client
+                                    DataEvent(this, new RealTimeEventArgs(document));
+                                }
+
+                                // shift array
+                                int end = (start + partLength);
+                                if (count - end > 0)
+                                    Array.Copy(buffer, end, buffer, 0, count - end);
+
+                                count = count - end;
+                                start = 0;
+                                body = false;
+                                partLength = 0;
+                                needMoreData = count < headerLen;
+                            }
                          } while (!needMoreData);
-                    } 
+                    }
                 }
                 catch (WebException exception)
                 {
