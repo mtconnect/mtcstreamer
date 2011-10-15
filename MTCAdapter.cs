@@ -13,12 +13,19 @@ namespace MTConnect
 
     public class MTCAdapter
     {
-        private int mPort;
         private Thread mListenThread;
         private ArrayList mClients = new ArrayList();
         private bool mRunning = false;
         private TcpListener mListener;
         byte[] PONG;
+
+        private int mPort;
+        public int Port
+        {
+            get { return mPort; }
+            set { mPort = value; }
+        }
+
 
         public MTCAdapter(int aPort = 7878)
         {

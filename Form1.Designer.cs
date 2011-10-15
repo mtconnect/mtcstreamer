@@ -44,11 +44,19 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.loadFile = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.adapterPort = new System.Windows.Forms.TextBox();
+            this.deviceUuid = new System.Windows.Forms.TextBox();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // startButton
             // 
-            this.startButton.Location = new System.Drawing.Point(97, 50);
+            this.startButton.Location = new System.Drawing.Point(577, 16);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(75, 23);
             this.startButton.TabIndex = 0;
@@ -59,23 +67,23 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 16);
+            this.label1.Location = new System.Drawing.Point(36, 29);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 13);
+            this.label1.Size = new System.Drawing.Size(81, 13);
             this.label1.TabIndex = 2;
-            this.label1.Text = "URL";
+            this.label1.Text = "Incomping URL";
             // 
             // url
             // 
-            this.url.Location = new System.Drawing.Point(82, 13);
+            this.url.Location = new System.Drawing.Point(122, 13);
             this.url.Name = "url";
-            this.url.Size = new System.Drawing.Size(391, 20);
+            this.url.Size = new System.Drawing.Size(264, 20);
             this.url.TabIndex = 3;
-            this.url.Text = "http://10.211.55.2:5000/";
+            this.url.Text = "http://localhost:5000/device";
             // 
             // stopButton
             // 
-            this.stopButton.Location = new System.Drawing.Point(224, 50);
+            this.stopButton.Location = new System.Drawing.Point(577, 74);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(75, 23);
             this.stopButton.TabIndex = 4;
@@ -88,17 +96,17 @@
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(12, 237);
+            this.textBox1.Location = new System.Drawing.Point(12, 254);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(473, 172);
+            this.textBox1.Size = new System.Drawing.Size(683, 155);
             this.textBox1.TabIndex = 5;
             // 
             // length
             // 
-            this.length.Location = new System.Drawing.Point(100, 134);
+            this.length.Location = new System.Drawing.Point(93, 172);
             this.length.Name = "length";
             this.length.Size = new System.Drawing.Size(176, 20);
             this.length.TabIndex = 6;
@@ -106,7 +114,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(43, 137);
+            this.label2.Location = new System.Drawing.Point(36, 175);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(40, 13);
             this.label2.TabIndex = 7;
@@ -115,7 +123,7 @@
             // toolId
             // 
             this.toolId.AutoSize = true;
-            this.toolId.Location = new System.Drawing.Point(43, 103);
+            this.toolId.Location = new System.Drawing.Point(36, 149);
             this.toolId.Name = "toolId";
             this.toolId.Size = new System.Drawing.Size(40, 13);
             this.toolId.TabIndex = 8;
@@ -124,7 +132,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(43, 163);
+            this.label3.Location = new System.Drawing.Point(20, 76);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 10;
@@ -132,14 +140,14 @@
             // 
             // diameter
             // 
-            this.diameter.Location = new System.Drawing.Point(100, 160);
+            this.diameter.Location = new System.Drawing.Point(93, 198);
             this.diameter.Name = "diameter";
             this.diameter.Size = new System.Drawing.Size(176, 20);
             this.diameter.TabIndex = 9;
             // 
             // update
             // 
-            this.update.Location = new System.Drawing.Point(234, 198);
+            this.update.Location = new System.Drawing.Point(500, 53);
             this.update.Name = "update";
             this.update.Size = new System.Drawing.Size(75, 23);
             this.update.TabIndex = 11;
@@ -150,7 +158,7 @@
             // lengthOffset
             // 
             this.lengthOffset.Enabled = false;
-            this.lengthOffset.Location = new System.Drawing.Point(287, 134);
+            this.lengthOffset.Location = new System.Drawing.Point(280, 172);
             this.lengthOffset.Name = "lengthOffset";
             this.lengthOffset.Size = new System.Drawing.Size(176, 20);
             this.lengthOffset.TabIndex = 12;
@@ -158,7 +166,7 @@
             // diameterOffset
             // 
             this.diameterOffset.Enabled = false;
-            this.diameterOffset.Location = new System.Drawing.Point(287, 160);
+            this.diameterOffset.Location = new System.Drawing.Point(280, 198);
             this.diameterOffset.Name = "diameterOffset";
             this.diameterOffset.Size = new System.Drawing.Size(176, 20);
             this.diameterOffset.TabIndex = 13;
@@ -170,7 +178,7 @@
             // 
             // loadFile
             // 
-            this.loadFile.Location = new System.Drawing.Point(348, 50);
+            this.loadFile.Location = new System.Drawing.Point(577, 45);
             this.loadFile.Name = "loadFile";
             this.loadFile.Size = new System.Drawing.Size(75, 23);
             this.loadFile.TabIndex = 14;
@@ -188,31 +196,93 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
             this.textBox2.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox2.Size = new System.Drawing.Size(473, 160);
+            this.textBox2.Size = new System.Drawing.Size(683, 160);
             this.textBox2.TabIndex = 15;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.deviceUuid);
+            this.groupBox1.Controls.Add(this.adapterPort);
+            this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.loadFile);
+            this.groupBox1.Controls.Add(this.startButton);
+            this.groupBox1.Controls.Add(this.stopButton);
+            this.groupBox1.Controls.Add(this.url);
+            this.groupBox1.Location = new System.Drawing.Point(15, 13);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(669, 106);
+            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Connection";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.update);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Location = new System.Drawing.Point(16, 125);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(675, 116);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Update";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(21, 45);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(66, 13);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Adapter Port";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(21, 71);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 13);
+            this.label5.TabIndex = 15;
+            this.label5.Text = "My Device UUID";
+            // 
+            // adapterPort
+            // 
+            this.adapterPort.Location = new System.Drawing.Point(122, 40);
+            this.adapterPort.Name = "adapterPort";
+            this.adapterPort.Size = new System.Drawing.Size(264, 20);
+            this.adapterPort.TabIndex = 16;
+            this.adapterPort.Text = "7878";
+            // 
+            // deviceUuid
+            // 
+            this.deviceUuid.Location = new System.Drawing.Point(122, 68);
+            this.deviceUuid.Name = "deviceUuid";
+            this.deviceUuid.Size = new System.Drawing.Size(264, 20);
+            this.deviceUuid.TabIndex = 17;
+            this.deviceUuid.Text = "cnc";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(498, 587);
+            this.ClientSize = new System.Drawing.Size(708, 587);
             this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.loadFile);
             this.Controls.Add(this.diameterOffset);
             this.Controls.Add(this.lengthOffset);
-            this.Controls.Add(this.update);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.diameter);
             this.Controls.Add(this.toolId);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.length);
             this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.stopButton);
-            this.Controls.Add(this.url);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.startButton);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.groupBox2);
             this.Name = "Form1";
             this.Text = "MTConnect Push Stream";
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -236,6 +306,12 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Button loadFile;
         private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox adapterPort;
+        private System.Windows.Forms.TextBox deviceUuid;
     }
 }
 

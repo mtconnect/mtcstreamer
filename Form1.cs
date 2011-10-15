@@ -17,6 +17,7 @@ namespace Streamer
       MTConnect.MTConnectStream stream = new MTConnect.MTConnectStream();
       MTConnect.MTCAdapter adapter = new MTConnect.MTCAdapter();
       String mToolId;
+      Uri mUri;
 
       delegate void SetTextCallback(string text);
 
@@ -44,13 +45,16 @@ namespace Streamer
 
       private void UpdateToolData(String assetId)
       {
-          String uri = url.Text + "assets/" + assetId;
+          String uri = "http://" + mUri.Host + ":" + mUri.Port + "/assets/" + assetId;
 
           // Now we get the actual asset
           XElement asset = XElement.Load(uri);
 
-          // Lets find a few pieces of data and display them specially.
+          // Let's first check if this was our asset
+          XNamespace mta = asset.Name.Namespace;
+          XElement node = asset.Descendants(mta + "CuttingTool").First();
 
+          // Lets find a few pieces of data and display them specially
           double[] length = ComputeOffset(asset, "OverallToolLength");
           double[] diameter = ComputeOffset(asset, "CuttingDiameterMax");
           Console.WriteLine("Length offset = {0}", length[1] - length[0]);
@@ -61,8 +65,16 @@ namespace Streamer
 
           this.diameter.Text = Convert.ToString(diameter[1]);
           this.diameterOffset.Text = Convert.ToString(diameter[1] - diameter[0]);
-
+              
           this.textBox2.Text = asset.ToString();
+
+          // Don't resend if this is loopback
+          if (node.Attribute("deviceUuid").Value != deviceUuid.Text)
+          {
+              String text = "@ASSET@|" + node.Attribute("assetId").Value + "|CuttingTool|--multiline--XXX\n" + 
+                            asset + "\n--multiline--XXX\n";
+              adapter.Send(text);
+          }
       }
 
       private void SetText(string text)
@@ -122,9 +134,16 @@ namespace Streamer
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            stream.Source = url.Text + "sample?interval=10&path=//DataItem[@type=\"ASSET_CHANGED\"]";
+            String b = url.Text;
+            if (!b.EndsWith("/")) b = b + "/";
+
+            mUri = new Uri(b);
+
+            stream.Source = b + "sample?interval=10&path=//DataItem[@type=\"ASSET_CHANGED\"]";
             stream.DataEvent += new MTConnect.RealTimeData.RealTimeEventHandler(PrintXML);
             stream.Start();
+
+            adapter.Port = Convert.ToInt32(adapterPort.Text);
             adapter.Start();
         }
 
@@ -155,6 +174,7 @@ namespace Streamer
                 String text = "@ASSET@|" + id + "|CuttingTool|--multiline--XXX\n" + xml
                      + "\n--multiline--XXX\n";
                 adapter.Send(text);
+                UpdateToolData(id);
             }
             catch (Exception)
             {
