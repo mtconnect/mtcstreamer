@@ -472,14 +472,13 @@ namespace MTConnect
                             needMoreData = true;
                             if (!body && count - start > headerLen)
                             {
-                                // Find the mime separator
+                                // Find the mime boundry indicating the mime head
                                 int head = ByteArrayUtils.Find(buffer, boundary, start, count - start);
                                 if (head == -1)
-                                {
                                     Console.WriteLine("Framing error, boundary not found\n");
-                                }
                                 else
                                 {
+                                    // Locate the end of the mime header.
                                     start = head + boundaryLen + 2;
                                     int ind = ByteArrayUtils.Find(buffer, mimeBoundry, start, count - start);
                                     if (ind != -1)
