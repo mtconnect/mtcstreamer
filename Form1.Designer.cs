@@ -45,11 +45,13 @@
             this.loadFile = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.adapterPort = new System.Windows.Forms.TextBox();
             this.deviceUuid = new System.Windows.Forms.TextBox();
+            this.adapterPort = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.toolLife = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -106,7 +108,7 @@
             // 
             // length
             // 
-            this.length.Location = new System.Drawing.Point(93, 172);
+            this.length.Location = new System.Drawing.Point(93, 169);
             this.length.Name = "length";
             this.length.Size = new System.Drawing.Size(176, 20);
             this.length.TabIndex = 6;
@@ -114,7 +116,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(36, 175);
+            this.label2.Location = new System.Drawing.Point(36, 172);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(40, 13);
             this.label2.TabIndex = 7;
@@ -123,7 +125,7 @@
             // toolId
             // 
             this.toolId.AutoSize = true;
-            this.toolId.Location = new System.Drawing.Point(36, 149);
+            this.toolId.Location = new System.Drawing.Point(36, 146);
             this.toolId.Name = "toolId";
             this.toolId.Size = new System.Drawing.Size(40, 13);
             this.toolId.TabIndex = 8;
@@ -132,7 +134,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(20, 76);
+            this.label3.Location = new System.Drawing.Point(20, 73);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 10;
@@ -140,14 +142,14 @@
             // 
             // diameter
             // 
-            this.diameter.Location = new System.Drawing.Point(93, 198);
+            this.diameter.Location = new System.Drawing.Point(93, 195);
             this.diameter.Name = "diameter";
             this.diameter.Size = new System.Drawing.Size(176, 20);
             this.diameter.TabIndex = 9;
             // 
             // update
             // 
-            this.update.Location = new System.Drawing.Point(500, 53);
+            this.update.Location = new System.Drawing.Point(500, 50);
             this.update.Name = "update";
             this.update.Size = new System.Drawing.Size(75, 23);
             this.update.TabIndex = 11;
@@ -158,7 +160,7 @@
             // lengthOffset
             // 
             this.lengthOffset.Enabled = false;
-            this.lengthOffset.Location = new System.Drawing.Point(280, 172);
+            this.lengthOffset.Location = new System.Drawing.Point(280, 169);
             this.lengthOffset.Name = "lengthOffset";
             this.lengthOffset.Size = new System.Drawing.Size(176, 20);
             this.lengthOffset.TabIndex = 12;
@@ -166,7 +168,7 @@
             // diameterOffset
             // 
             this.diameterOffset.Enabled = false;
-            this.diameterOffset.Location = new System.Drawing.Point(280, 198);
+            this.diameterOffset.Location = new System.Drawing.Point(280, 195);
             this.diameterOffset.Name = "diameterOffset";
             this.diameterOffset.Size = new System.Drawing.Size(176, 20);
             this.diameterOffset.TabIndex = 13;
@@ -209,32 +211,28 @@
             this.groupBox1.Controls.Add(this.startButton);
             this.groupBox1.Controls.Add(this.stopButton);
             this.groupBox1.Controls.Add(this.url);
-            this.groupBox1.Location = new System.Drawing.Point(15, 13);
+            this.groupBox1.Location = new System.Drawing.Point(12, 13);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(669, 106);
+            this.groupBox1.Size = new System.Drawing.Size(683, 106);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Connection";
             // 
-            // groupBox2
+            // deviceUuid
             // 
-            this.groupBox2.Controls.Add(this.update);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(16, 125);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(675, 116);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Update";
+            this.deviceUuid.Location = new System.Drawing.Point(122, 68);
+            this.deviceUuid.Name = "deviceUuid";
+            this.deviceUuid.Size = new System.Drawing.Size(264, 20);
+            this.deviceUuid.TabIndex = 17;
+            this.deviceUuid.Text = "cnc";
             // 
-            // label4
+            // adapterPort
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(21, 45);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(66, 13);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "Adapter Port";
+            this.adapterPort.Location = new System.Drawing.Point(122, 40);
+            this.adapterPort.Name = "adapterPort";
+            this.adapterPort.Size = new System.Drawing.Size(264, 20);
+            this.adapterPort.TabIndex = 16;
+            this.adapterPort.Text = "7878";
             // 
             // label5
             // 
@@ -245,21 +243,43 @@
             this.label5.TabIndex = 15;
             this.label5.Text = "My Device UUID";
             // 
-            // adapterPort
+            // label4
             // 
-            this.adapterPort.Location = new System.Drawing.Point(122, 40);
-            this.adapterPort.Name = "adapterPort";
-            this.adapterPort.Size = new System.Drawing.Size(264, 20);
-            this.adapterPort.TabIndex = 16;
-            this.adapterPort.Text = "7878";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(21, 45);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(66, 13);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Adapter Port";
             // 
-            // deviceUuid
+            // groupBox2
             // 
-            this.deviceUuid.Location = new System.Drawing.Point(122, 68);
-            this.deviceUuid.Name = "deviceUuid";
-            this.deviceUuid.Size = new System.Drawing.Size(264, 20);
-            this.deviceUuid.TabIndex = 17;
-            this.deviceUuid.Text = "cnc";
+            this.groupBox2.Controls.Add(this.label6);
+            this.groupBox2.Controls.Add(this.toolLife);
+            this.groupBox2.Controls.Add(this.update);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Location = new System.Drawing.Point(12, 125);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(683, 123);
+            this.groupBox2.TabIndex = 17;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Update";
+            // 
+            // toolLife
+            // 
+            this.toolLife.Location = new System.Drawing.Point(81, 96);
+            this.toolLife.Name = "toolLife";
+            this.toolLife.Size = new System.Drawing.Size(176, 20);
+            this.toolLife.TabIndex = 18;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(20, 99);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(48, 13);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Tool Life";
             // 
             // Form1
             // 
@@ -312,6 +332,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox adapterPort;
         private System.Windows.Forms.TextBox deviceUuid;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox toolLife;
     }
 }
 

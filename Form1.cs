@@ -52,7 +52,11 @@ namespace Streamer
 
           // Let's first check if this was our asset
           XNamespace mta = asset.Name.Namespace;
-          XElement node = asset.Descendants(mta + "CuttingTool").First();
+          XElement node = asset.Descendants(mta + "ToolLife").First();
+
+          // Get the tool life
+          if (node != null)
+              this.toolLife.Text = node.Value;
 
           // Lets find a few pieces of data and display them specially
           double[] length = ComputeOffset(asset, "OverallToolLength");
@@ -67,6 +71,9 @@ namespace Streamer
           this.diameterOffset.Text = Convert.ToString(diameter[1] - diameter[0]);
               
           this.textBox2.Text = asset.ToString();
+
+          // Get cutting tool
+          node = asset.Descendants(mta + "CuttingTool").First();
 
           // Don't resend if this is loopback
           if (node.Attribute("deviceUuid").Value != deviceUuid.Text)
@@ -149,8 +156,10 @@ namespace Streamer
 
         private void update_Click(object sender, EventArgs e)
         {
-            String text = "@UPDATE_ASSET@|" + mToolId + "|OverallToolLength|" + 
-                length.Text + "|CuttingDiameterMax|" + diameter.Text + "\n";
+            String text = "@UPDATE_ASSET@|" + mToolId + 
+                "|OverallToolLength|" +  length.Text + 
+                "|CuttingDiameterMax|" + diameter.Text + 
+                "|ToolLife@type=PART_COUNT|" + toolLife.Text + "\n";
             adapter.Send(text);
         }
 
