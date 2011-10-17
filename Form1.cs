@@ -63,6 +63,7 @@ namespace Streamer
           double[] diameter = ComputeOffset(asset, "CuttingDiameterMax");
           Console.WriteLine("Length offset = {0}", length[1] - length[0]);
           Console.WriteLine("Diameter offset = {0}", diameter[1] - diameter[0]);
+          Console.WriteLine("Tool Life offset = {0}", this.toolLife.Text);
 
           this.length.Text = Convert.ToString(length[1]);
           this.lengthOffset.Text = Convert.ToString(length[1] - length[0]);
@@ -156,10 +157,18 @@ namespace Streamer
 
         private void update_Click(object sender, EventArgs e)
         {
+            string status;
+            if (toolLife.Text != "0")
+                status = "USED";
+            else
+                status = "NEW";
+            status += ",MEASURED";
+
             String text = "@UPDATE_ASSET@|" + mToolId + 
                 "|OverallToolLength|" +  length.Text + 
                 "|CuttingDiameterMax|" + diameter.Text + 
-                "|ToolLife@type=PART_COUNT|" + toolLife.Text + "\n";
+                "|ToolLife@type=PART_COUNT|" + toolLife.Text + 
+                "|CutterStatus|" + status + "\n";
             adapter.Send(text);
         }
 
