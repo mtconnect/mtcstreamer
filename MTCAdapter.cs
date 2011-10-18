@@ -75,49 +75,56 @@ namespace MTConnect
             ASCIIEncoding encoder = new ASCIIEncoding();
             int length = 0;
 
-            while (mRunning && tcpClient.Connected)
+            try
             {
-                int bytesRead = 0;
+                while (mRunning && tcpClient.Connected)
+                {
+                    int bytesRead = 0;
 
-                try
-                {
-                    //blocks until a client sends a message
-                    bytesRead = clientStream.Read(message, length, 4096 - length);
-                }
-                catch
-                {
-                    //a socket error has occured
-                    break;
-                }
-
-                if (bytesRead == 0)
-                {
-                    //the client has disconnected from the server
-                    break;
-                }
-
-                // See if we have a line
-                int pos = length;
-                length += bytesRead;
-                int eol = 0;
-                for (int i = pos; i < length; i++)
-                {
-                    if (message[i] == '\n')
+                    try
                     {
-                        String line = encoder.GetString(message, eol, i);
-                        Receive(clientStream, line);
-                        eol = i + 1;
+                        //blocks until a client sends a message
+                        bytesRead = clientStream.Read(message, length, 4096 - length);
+                    }
+                    catch
+                    {
+                        //a socket error has occured
+                        break;
+                    }
+
+                    if (bytesRead == 0)
+                    {
+                        //the client has disconnected from the server
+                        break;
+                    }
+
+                    // See if we have a line
+                    int pos = length;
+                    length += bytesRead;
+                    int eol = 0;
+                    for (int i = pos; i < length; i++)
+                    {
+                        if (message[i] == '\n')
+                        {
+                            String line = encoder.GetString(message, eol, i);
+                            Receive(clientStream, line);
+                            eol = i + 1;
+                        }
+                    }
+
+                    // Remove the lines that have been processed.
+                    if (eol > 0)
+                    {
+                        length = length - eol;
+                        // Shift the message array to remove the lines.
+                        if (length > 0)
+                            Array.Copy(message, eol, message, 0, length);
                     }
                 }
-
-                // Remove the lines that have been processed.
-                if (eol > 0)
-                {
-                    length = length - eol;
-                    // Shift the message array to remove the lines.
-                    if (length > 0)
-                        Array.Copy(message, eol, message, 0, length);
-                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Error during heartbeat");
             }
 
             tcpClient.Close();
@@ -130,15 +137,23 @@ namespace MTConnect
             mListener.Start();
             mRunning = true;
 
-            while (mRunning)
+            try
             {
-                //blocks until a client has connected to the server
-                TcpClient client = mListener.AcceptTcpClient();
+                while (mRunning)
+                {
+                    //blocks until a client has connected to the server
+                    TcpClient client = mListener.AcceptTcpClient();
 
-                //create a thread to handle communication 
-                //with connected client
-                Thread clientThread = new Thread(new ParameterizedThreadStart(HeartbeatClient));
-                clientThread.Start(client);
+                    //create a thread to handle communication 
+                    //with connected client
+                    Thread clientThread = new Thread(new ParameterizedThreadStart(HeartbeatClient));
+                    clientThread.Start(client);
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Execption occurred waiting for connection");
+                mListener.Stop();
             }
         }
 
@@ -155,6 +170,11 @@ namespace MTConnect
         {
             mRunning = false;
             mListener.Stop();
+            foreach (Object obj in mClients) {
+                NetworkStream client = (NetworkStream)obj;
+                client.Close();
+            }
+            mClients.Clear();
         }
     }
 }

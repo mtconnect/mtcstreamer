@@ -376,7 +376,7 @@ namespace MTConnect
             byte[] mimeBoundry = new byte[] { 13, 10, 13, 10 };
             char[] crlf = new char[] { '\r', '\n' };
 
-            while (true)
+            while (!stopEvent.WaitOne(0, true))
             {
                 // reset reload event
                 reloadEvent.Reset();
@@ -384,7 +384,7 @@ namespace MTConnect
                 // HTTP web request
                 HttpWebRequest request = null;
                 // web responce
-                WebResponse responce = null;
+                WebResponse response = null;
                 // stream for MTConnect downloading
                 Stream stream = null;
                 // boundary betweeen xml documents
@@ -414,18 +414,18 @@ namespace MTConnect
                         request.ConnectionGroupName = GetHashCode().ToString();
 
                     // get response
-                    responce = request.GetResponse();
+                    response = request.GetResponse();
 
                     // check content type
-                    string contentType = responce.ContentType;
+                    string contentType = response.ContentType;
                     if (contentType.IndexOf("multipart/x-mixed-replace") == -1)
                     {
                         // Notify of error...
                         /// ErrorEventArgs handler...
                         request.Abort();
                         request = null;
-                        responce.Close();
-                        responce = null;
+                        response.Close();
+                        response = null;
 
                         // need to stop ?
                         if (stopEvent.WaitOne(0, true))
@@ -443,7 +443,7 @@ namespace MTConnect
                     int headerLen = "Content-type: text/xml\r\nContent-length: 12345\r\n\r\n".Length;
 
                     // get response stream
-                    stream = responce.GetResponseStream();
+                    stream = response.GetResponseStream();
  
 
                     // loop
@@ -563,17 +563,13 @@ namespace MTConnect
                         stream = null;
                     }
                     // close response
-                    if (responce != null)
+                    if (response != null)
                     {
-                        responce.Close();
-                        responce = null;
+                        response.Close();
+                        response = null;
                     }
                 }
-
-                // need to stop ?
-                if (stopEvent.WaitOne(0, true))
-                    break;
-            }
+           }
         }
     }
 }

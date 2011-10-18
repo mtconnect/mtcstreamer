@@ -50,8 +50,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.toolLife = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.toolLife = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -81,7 +81,7 @@
             this.url.Name = "url";
             this.url.Size = new System.Drawing.Size(264, 20);
             this.url.TabIndex = 3;
-            this.url.Text = "http://localhost:5000/device";
+            this.url.Text = "http://localhost:5000/presetter";
             // 
             // stopButton
             // 
@@ -232,7 +232,7 @@
             this.adapterPort.Name = "adapterPort";
             this.adapterPort.Size = new System.Drawing.Size(264, 20);
             this.adapterPort.TabIndex = 16;
-            this.adapterPort.Text = "7878";
+            this.adapterPort.Text = "7879";
             // 
             // label5
             // 
@@ -265,13 +265,6 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Update";
             // 
-            // toolLife
-            // 
-            this.toolLife.Location = new System.Drawing.Point(81, 96);
-            this.toolLife.Name = "toolLife";
-            this.toolLife.Size = new System.Drawing.Size(176, 20);
-            this.toolLife.TabIndex = 18;
-            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -280,6 +273,13 @@
             this.label6.Size = new System.Drawing.Size(48, 13);
             this.label6.TabIndex = 18;
             this.label6.Text = "Tool Life";
+            // 
+            // toolLife
+            // 
+            this.toolLife.Location = new System.Drawing.Point(81, 96);
+            this.toolLife.Name = "toolLife";
+            this.toolLife.Size = new System.Drawing.Size(176, 20);
+            this.toolLife.TabIndex = 18;
             // 
             // Form1
             // 

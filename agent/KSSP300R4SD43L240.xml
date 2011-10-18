@@ -1,4 +1,4 @@
-<CuttingTool serialNumber="1" toolId="KSSP300R4SD43L240" timestamp="2011-05-11T13:55:22" assetId="KSSP300R4SD43L240.1" manufacturers="KMT,Parlec">
+<CuttingTool serialNumber="1" toolId="KSSP300R4SD43L240" timestamp="2011-05-11T13:55:22" assetId="KSSP300R4SD43L240.3" manufacturers="KMT,Parlec">
 	<CuttingToolLifeCycle>
 		<CutterStatus><Status>NEW</Status></CutterStatus>
 		<ToolLife type="PART_COUNT" initial="0" countDirection="UP" limit="10">0</ToolLife>

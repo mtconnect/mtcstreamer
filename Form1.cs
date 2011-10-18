@@ -172,6 +172,7 @@ namespace Streamer
             adapter.Send(text);
         }
 
+        int mNumber = 0;
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
             FileStream file = null;
@@ -187,10 +188,14 @@ namespace Streamer
                 String xml = encoder.GetString(tool, 0, tool.Length);
                 XElement root = XElement.Parse(xml);
                 String id = root.Attribute("assetId").Value;
+                id += Convert.ToSingle(mNumber);
+                mNumber += 1;
+
+                root.SetAttributeValue("assetId", id);
 
                 // Create the line
-                String text = "@ASSET@|" + id + "|CuttingTool|--multiline--XXX\n" + xml
-                     + "\n--multiline--XXX\n";
+                String text = "@ASSET@|" + id + "|CuttingTool|--multiline--XXX\n" + root.ToString() +
+                     "\n--multiline--XXX\n";
                 adapter.Send(text);
                 UpdateToolData(id);
             }
