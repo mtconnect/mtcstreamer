@@ -146,20 +146,7 @@ namespace Streamer
             if (!b.EndsWith("/")) b = b + "/";
 
             mUri = new Uri(b);
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(b + "current");
-            request.KeepAlive = false;
-            // set timeout value for the request
-            WebResponse response = request.GetResponse();
-            XElement current = XElement.Load(response.GetResponseStream());
-
-            // Let's first check if this was our asset
-            XNamespace mta = current.Name.Namespace;
-            XElement header = current.Descendants(mta + "Header").First();
-            String nextSequence = header.Attribute("nextSequence").Value;
-
-            stream.Source = b + "sample?interval=10&path=//DataItem[@type=\"ASSET_CHANGED\"]&from=" +
-                nextSequence;
+            stream.Source = b + "sample?interval=10&path=//DataItem[@type=\"ASSET_CHANGED\"]";
             stream.DataEvent += new MTConnect.RealTimeData.RealTimeEventHandler(PrintXML);
             stream.Start();
 

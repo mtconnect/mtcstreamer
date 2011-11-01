@@ -8,6 +8,8 @@ namespace MTConnect
     using System.Threading;
     using System.Net;
     using System.Windows.Forms;
+    using System.Xml.Linq;
+    using System.Linq;
 
     internal class ByteArrayUtils
     {
@@ -403,8 +405,32 @@ namespace MTConnect
 
                 try
                 {
+                    // Perform a current and initialize the callback...
+                    Uri b = new Uri(source);
+                    string[] pathParts = b.AbsolutePath.Split('/');
+                    string device = "";
+                    if (pathParts.Length >= 2) 
+                        device = pathParts[1];
+                    string current = "http://" + b.Host + ":" + b.Port + "/" + device
+                         + "/current";
+                    HttpWebRequest curentRequest = (HttpWebRequest)WebRequest.Create(current);
+                    curentRequest.KeepAlive = false;
+                    // set timeout value for the request
+                    WebResponse curentResponse = curentRequest.GetResponse();
+                    StreamReader currentReader = new StreamReader(curentResponse.GetResponseStream());
+                    string doc = currentReader.ReadToEnd();
+                    XElement currentDoc = XElement.Parse(doc);
+
+                    // Let's first check if this was our asset
+                    XNamespace currentNs = currentDoc.Name.Namespace;
+                    XElement currentHeader = currentDoc.Descendants(currentNs + "Header").First();
+                    String nextSequence = currentHeader.Attribute("nextSequence").Value;
+
+                    // Call the callback with the current data...
+                    DataEvent(this, new RealTimeEventArgs(doc));
+
                     // create request
-                    request = (HttpWebRequest)WebRequest.Create(source);
+                    request = (HttpWebRequest)WebRequest.Create(source + "&from=" + nextSequence);
                     request.KeepAlive = false;
                     // set timeout value for the request
                     request.Timeout = requestTimeout;
@@ -546,7 +572,7 @@ namespace MTConnect
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine("Execption occurred: {0}", exception.Message);
+                    Console.WriteLine("Execption occurred: {0}\n{1}", exception.Message, exception.StackTrace);
                 }
                 finally
                 {
