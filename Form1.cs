@@ -18,6 +18,7 @@ namespace Streamer
       MTConnect.MTCAdapter adapter = new MTConnect.MTCAdapter();
       String mToolId;
       Uri mUri;
+      String mLength;
 
       delegate void SetTextCallback(string text);
 
@@ -59,7 +60,12 @@ namespace Streamer
               this.toolLife.Text = node.Value;
 
           // Lets find a few pieces of data and display them specially
-          double[] length = ComputeOffset(asset, "OverallToolLength");
+          mLength = "OverallToolLength";
+          double[] length = ComputeOffset(asset, mLength);
+          if (length[0] == 0.0) {
+              mLength = "FunctionalLength";
+              length = ComputeOffset(asset, mLength);
+          }
           double[] diameter = ComputeOffset(asset, "CuttingDiameterMax");
           Console.WriteLine("Length offset = {0}", length[1] - length[0]);
           Console.WriteLine("Diameter offset = {0}", diameter[1] - diameter[0]);
@@ -164,7 +170,7 @@ namespace Streamer
             status += ",MEASURED";
 
             String text = "@UPDATE_ASSET@|" + mToolId + 
-                "|OverallToolLength|" +  length.Text + 
+                "|" + mLength + "|" +  length.Text + 
                 "|CuttingDiameterMax|" + diameter.Text + 
                 "|ToolLife@type=PART_COUNT|" + toolLife.Text + 
                 "|CutterStatus|" + status + "\n";
