@@ -2,7 +2,6 @@
 
 namespace MTConnect
 {
-    using System;
     using System.IO;
     using System.Text;
     using System.Threading;
@@ -10,6 +9,42 @@ namespace MTConnect
     using System.Net.Sockets;
     using System.Windows.Forms;
     using System.Collections;
+
+    public class MTCDataItem
+    {
+        private String mName;
+        private String mValue = "UNAVAILABLE";
+        bool mChanged = true;
+
+        public MTCDataItem(String name)
+        {
+            mName = name;
+        }
+
+        public String Value {
+            set { 
+                if (mValue != value) {
+                    mValue = value;
+                    mChanged = true;
+                }
+            }
+            get { return mValue; }
+        }
+
+        public void ResetChanged()
+        {
+            mChanged = false;
+        }
+
+        public bool Changed {
+            get { return mChanged; }
+        }
+
+        public override string ToString()
+        {
+            return mName + "|" + mValue;
+        }
+    }
 
     public class MTCAdapter
     {
@@ -32,6 +67,15 @@ namespace MTConnect
             mPort = aPort;
             ASCIIEncoding encoder = new ASCIIEncoding();
             PONG = encoder.GetBytes("* PONG 10000\n");
+        }
+
+        public void Send(MTCDataItem aDI)
+        {
+            if (aDI.Changed)
+            {
+                Send(aDI.ToString());
+                aDI.ResetChanged();
+            }
         }
 
         public void Send(String aText)

@@ -12,129 +12,144 @@ using System.IO;
 
 namespace Streamer
 {
-  public partial class Form1 : Form
+    public partial class Form1 : Form
     {
-      MTConnect.MTConnectStream stream = new MTConnect.MTConnectStream();
-      MTConnect.MTCAdapter adapter = new MTConnect.MTCAdapter();
-      String mToolId;
-      Uri mUri;
-      String mLength;
+        MTConnect.MTConnectStream stream = new MTConnect.MTConnectStream();
+        MTConnect.MTCAdapter adapter = new MTConnect.MTCAdapter();
+        Uri mUri;
 
-      delegate void SetTextCallback(string text);
+        delegate void SetTextCallback(string text);
+        delegate void ErrorCallback(object sender, MTConnect.ErrorArgs args);
 
-      private double[] ComputeOffset(XElement asset, String name)
-      {
-          double[] values = new double[2];
-          values[0] = values[1] = 0.0;
-          try
-          {
-              XNamespace mta = asset.Name.Namespace;
-              XElement node = asset.Descendants(mta + name).First();
-              if (node != null)
-              {
-                  values[0] = Convert.ToDouble(node.Attribute("nominal").Value);
-                  values[1] = Convert.ToDouble(node.Value);
-              }
-          }
-          catch (Exception)
-          {
-              Console.WriteLine("Cannot get offset");
-          }
-
-          return values;
-      }
-
-      private void UpdateToolData(String assetId)
-      {
-          String uri = "http://" + mUri.Host + ":" + mUri.Port + "/assets/" + assetId;
-
-          // Now we get the actual asset
-          XElement asset = XElement.Load(uri);
-
-          // Let's first check if this was our asset
-          XNamespace mta = asset.Name.Namespace;
-          XElement node = asset.Descendants(mta + "ToolLife").First();
-
-          // Get the tool life
-          if (node != null)
-              this.toolLife.Text = node.Value;
-
-          // Lets find a few pieces of data and display them specially
-          mLength = "OverallToolLength";
-          double[] length = ComputeOffset(asset, mLength);
-          if (length[0] == 0.0) {
-              mLength = "FunctionalLength";
-              length = ComputeOffset(asset, mLength);
-          }
-          double[] diameter = ComputeOffset(asset, "CuttingDiameterMax");
-          Console.WriteLine("Length offset = {0}", length[1] - length[0]);
-          Console.WriteLine("Diameter offset = {0}", diameter[1] - diameter[0]);
-          Console.WriteLine("Tool Life offset = {0}", this.toolLife.Text);
-
-          this.length.Text = Convert.ToString(length[1]);
-          this.lengthOffset.Text = Convert.ToString(length[1] - length[0]);
-
-          this.diameter.Text = Convert.ToString(diameter[1]);
-          this.diameterOffset.Text = Convert.ToString(diameter[1] - diameter[0]);
-              
-          this.textBox2.Text = asset.ToString();
-
-          // Get cutting tool
-          node = asset.Descendants(mta + "CuttingTool").First();
-
-          // Don't resend if this is loopback
-          if (node.Attribute("deviceUuid").Value != deviceUuid.Text)
-          {
-              String text = "@ASSET@|" + node.Attribute("assetId").Value + "|CuttingTool|--multiline--XXX\n" + 
-                            asset + "\n--multiline--XXX\n";
-              adapter.Send(text);
-          }
-      }
-
-      private void SetText(string text)
-      {
-          // InvokeRequired required compares the thread ID of the
-          // calling thread to the thread ID of the creating thread.
-          // If these threads are different, it returns true.
-          if (this.textBox1.InvokeRequired)
-          {
-              SetTextCallback d = new SetTextCallback(SetText);
-              this.Invoke(d, new object[] { text });
-          }
-          else
-          { 
-              // First lets check for the AssetChanged event...
-              XElement root = XElement.Parse(text);
-              XNamespace mts = root.Name.Namespace;
-
-              IEnumerable<XElement> changed = 
-                  from node in root.Descendants(mts + "AssetChanged")
-                  select node;
-
-              // For each asset, get the tool data
-              foreach (XElement assetChanged in changed)
-              {
-                  XAttribute kind = assetChanged.Attribute("assetType");
-                  if (assetChanged.Value != "UNAVAILABLE" &&
-                      kind != null && kind.Value == "CuttingTool")
-                  {
-                      mToolId = assetChanged.Value;
-                      UpdateToolData(mToolId);
-
-                      this.toolId.Text = mToolId;
-                  }
-              }
-
-              text = text.Replace("\n", "\r\n");
-              this.textBox1.Text = text;
-          }
-      }
-
-        void PrintXML(object sender, MTConnect.RealTimeEventArgs args)
+        private void HandleEvent(XNode node)
         {
-            SetText(args.document);
+            if (node.GetType() != typeof(XElement))
+                return;
+
+            XElement element = (XElement) node;
+
+            // Check each event, for the two interfaces, we'll handle
+            // only the complete state, since that is what we're limited 
+            // to...
+            if (element.Name.LocalName == "LoadMaterial" || element.Name.LocalName == "ChangeMaterial")
+            {
+                HandleInterface(element);
+            }
+            else if (element.Name.LocalName == "EndOfBar")
+            {
+                this.iIN24.Checked = element.Value == "ACTIVE";
+                this.endOfBar.Text = element.Value;
+            }
+            else if (element.Name.LocalName == "SpindleInterlock")
+            {
+                this.iSPOK.Checked = element.Value == "ACTIVE";
+                this.spindleInterlock.Text = element.Value;
+            }
+            else
+            {
+                Console.WriteLine("Unknown node: " + element.Name);
+            }
         }
-  
+
+        private void HandleInterface(XElement node)
+        {
+            bool completed = node.Value == "COMPLETE";
+            if (node.Name.LocalName == "LoadMaterial")
+            {
+                this.iMATADV.Checked = completed;
+                this.loadMaterial.Text = node.Value;
+            }
+            else if (node.Name.LocalName == "ChangeMaterial")
+            {
+                this.iMATCHG.Checked = completed;
+                this.changeMaterial.Text = node.Value;
+            }
+            else
+            {
+                Console.WriteLine("Unknown node: " + node.Name);
+            }
+        }
+
+        private void HandleCondition(XElement cond)
+        {
+            bool active = cond.Name.LocalName != "Fault" &&
+                    cond.Name.LocalName != "Unavailable";
+            if (cond.Attribute("type").Value == "FILL_LEVEL")
+            {
+                this.empty.Text = cond.Value;
+                this.iNMCY_B.Checked = active;
+            }
+            else 
+            {
+                this.condition.Text = cond.Value;
+                this.iBFANML_B.Checked = active;
+            }
+        }
+
+        private void ParseXML(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            if (this.endOfBar.InvokeRequired)
+            {
+                SetTextCallback d = new SetTextCallback(ParseXML);
+                this.Invoke(d, new object[] { text });
+            }
+            else
+            {
+                // Check for changes to the BarFeeder interface data items
+                // and update the bits in AnyBus
+                XElement barfeed = XElement.Parse(text);
+                XNamespace ns = barfeed.Name.Namespace;
+
+                // First check for any Faults...
+                IEnumerable<XElement> conditionLists =
+                    from node in barfeed.Descendants(ns + "Condition")
+                    select node;
+                foreach (XElement conditionList in conditionLists)
+                {
+                    foreach (XNode cond in conditionList.Nodes())
+                        HandleCondition((XElement) cond);
+                }
+
+                // Now we handle the remaining states...
+                IEnumerable<XElement> eventLists =
+                    from node in barfeed.Descendants(ns + "Events")
+                    select node;
+                foreach (XElement eventList in eventLists)
+                {
+                    foreach (XNode evt in eventList.Nodes())
+                        HandleEvent(evt);
+                }
+            }
+        }
+
+        void ReceiveStream(object sender, MTConnect.RealTimeEventArgs args)
+        {
+            ParseXML(args.document);
+        }
+
+        void HandleConnectionError(object sender, MTConnect.ErrorArgs args)
+        {
+            Console.WriteLine("MTConnect stream just disconnected: " + args.why);
+            if (this.endOfBar.InvokeRequired)
+            {
+                ErrorCallback d = new ErrorCallback(HandleConnectionError);
+                this.Invoke(d, new object[] { sender, args });
+            }
+            else
+            {
+                // Stream is now disconnected... set all DIO signals 
+                // to low. Will automatically update on reconnect.
+                this.iBFANML_B.Checked = false;
+                this.iNMCY_B.Checked = false;
+                this.iMATADV.Checked = false;
+                this.iMATCHG.Checked = false;
+                this.iIN24.Checked = false;
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -143,7 +158,7 @@ namespace Streamer
         private void stopButton_Click(object sender, EventArgs e)
         {
             adapter.Stop();
-            stream.Stop();   
+            stream.Stop();
         }
 
         private void startButton_Click(object sender, EventArgs e)
@@ -151,72 +166,28 @@ namespace Streamer
             String b = url.Text;
             if (!b.EndsWith("/")) b = b + "/";
 
+            // Put all checkboxes in base states. need to check if this flashes
+            // or if the UI waits to update.
+            this.iNMCY_B.Checked = false;
+            this.iMATADV.Checked = false;
+            this.iMATCHG.Checked = false;
+            this.iIN24.Checked = false;
+
             mUri = new Uri(b);
-            stream.Source = b + "sample?interval=10&path=//DataItem[@type=\"ASSET_CHANGED\"]";
-            stream.DataEvent += new MTConnect.RealTimeData.RealTimeEventHandler(PrintXML);
+            stream.Source = b + "sample?interval=0&heartbeat=1000";
+            stream.RequestTimeout = 2000;
+            stream.DataEvent += new MTConnect.RealTimeData.RealTimeEventHandler(ReceiveStream);
+            stream.ConnectionEvent += new MTConnect.ConnectionError.ConnectionErrorHandler(HandleConnectionError);
             stream.Start();
 
             adapter.Port = Convert.ToInt32(adapterPort.Text);
             adapter.Start();
         }
 
-        private void update_Click(object sender, EventArgs e)
+        // Monitor AnyBus bits to activate bar feeder...
+        private void Monitor(object sender, EventArgs e)
         {
-            string status;
-            if (toolLife.Text != "0")
-                status = "USED";
-            else
-                status = "NEW";
-            status += ",MEASURED";
-
-            String text = "@UPDATE_ASSET@|" + mToolId + 
-                "|" + mLength + "|" +  length.Text + 
-                "|CuttingDiameterMax|" + diameter.Text + 
-                "|ToolLife@type=PART_COUNT|" + toolLife.Text + 
-                "|CutterStatus|" + status + "\n";
-            adapter.Send(text);
-        }
-
-        int mNumber = 0;
-        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
-            FileStream file = null;
-            try
-            {
-                Console.WriteLine("Got file {0}\n", openFileDialog1.FileName);
-                file = new FileStream(openFileDialog1.FileName, FileMode.Open);
-                byte[] tool = new byte[file.Length];
-                file.Read(tool, 0, (int)file.Length);
-                ASCIIEncoding encoder = new ASCIIEncoding();
-
-                // Get the asset id...
-                String xml = encoder.GetString(tool, 0, tool.Length);
-                XElement root = XElement.Parse(xml);
-                String id = root.Attribute("assetId").Value;
-                id += Convert.ToSingle(mNumber);
-                mNumber += 1;
-
-                root.SetAttributeValue("assetId", id);
-
-                // Create the line
-                String text = "@ASSET@|" + id + "|CuttingTool|--multiline--XXX\n" + root.ToString() +
-                     "\n--multiline--XXX\n";
-                adapter.Send(text);
-                UpdateToolData(id);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Failed to send file {0}", 
-                    openFileDialog1.FileName); 
-            }
-
-            if (file != null)
-                file.Close();
-        }
-
-        private void loadFile_Click(object sender, EventArgs e)
-        {
-            openFileDialog1.ShowDialog();
+            //adapter.Send(text);
         }
     }
 }

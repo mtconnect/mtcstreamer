@@ -109,6 +109,27 @@ namespace MTConnect
         }
     }
 
+    public class ErrorArgs : EventArgs
+    {
+        public ErrorArgs(string why)
+        {
+            this.why = why;
+        }
+
+        public string why;
+    }
+
+    public class ConnectionError
+    {
+        public delegate void ConnectionErrorHandler(object sender, ErrorArgs args);
+        public event ConnectionErrorHandler ConnectionEvent;
+        public void SendConnectionError(string why)
+        {
+            ErrorArgs args = new ErrorArgs(why);
+            ConnectionEvent(this, args);
+        }
+    }
+
     public class MTConnectStream
     {
         // URL for MTConnect stream
@@ -141,6 +162,9 @@ namespace MTConnect
         /// <remarks>New MTConnect XML chunk has arrived.</remarks>
         /// 
         public event RealTimeData.RealTimeEventHandler DataEvent;
+
+        // Connection error handler
+        public event ConnectionError.ConnectionErrorHandler ConnectionEvent;
 
         /// <summary>
         /// Use or not separate connection group.
@@ -470,7 +494,7 @@ namespace MTConnect
 
                     // get response stream
                     stream = response.GetResponseStream();
- 
+                    stream.ReadTimeout = 2000;
 
                     // loop
                     while ((!stopEvent.WaitOne(0, true)) && (!reloadEvent.WaitOne(0, true)))
@@ -563,16 +587,20 @@ namespace MTConnect
                 {
                     // provide information to clients
                     // wait for a while before the next try
-                    Thread.Sleep(250);
+                    ConnectionEvent(this, new ErrorArgs(exception.ToString()));
+                    Thread.Sleep(1000);
                 }
-                catch (ApplicationException)
+                catch (ApplicationException exception)
                 {
                     // wait for a while before the next try
-                    Thread.Sleep(250);
+                    ConnectionEvent(this, new ErrorArgs(exception.ToString()));
+                    Thread.Sleep(1000);
                 }
                 catch (Exception exception)
                 {
+                    ConnectionEvent(this, new ErrorArgs(exception.ToString()));
                     Console.WriteLine("Execption occurred: {0}\n{1}", exception.Message, exception.StackTrace);
+                    Thread.Sleep(1000);
                 }
                 finally
                 {
