@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MTConnectDevices xmlns:m="urn:mtconnect.org:MTConnectDevices:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mtconnect.org:MTConnectDevices:1.2">
+  <Header creationTime="2009-03-22T01:50:29+00:00" sender="localhost" instanceId="1237628993" bufferSize="100000" version="1.1"/>
+  <Devices>
+    <Device uuid="BARFEED-000" name="BarFeeder" sampleRate="10.0" id="b">
+      <Description manufacturer="EDGE" serialNumber=""/>
+      <DataItems>
+	      <DataItem type="AVAILABILITY" category="EVENT" id="avail" name="avail"/>
+        <DataItem type="SYSTEM" category="CONDITION" id="sy" name="system" />
+      </DataItems>
+      <Components>
+        <Controller name="Controller" id="cont">
+          <DataItems>
+        		<DataItem type="CONTROLLER_MODE" category="EVENT" id="mode" name="mode"/>
+        		<DataItem type="EXECUTION" category="EVENT" id="exec" name="exec"/>
+        		<DataItem type="END_OF_BAR" category="EVENT" id="eob" name="eob" />
+          </DataItems>
+        </Controller>
+        <Magazine name="mag" id="mag">
+          <DataItems>
+            <DataItem type="FILL_LEVEL" category="CONDITION" id="fl" name="fill" />
+            <DataItem type="REMAINING_MATERIAL" category="EVENT" id="rm" name="remain" />
+          </DataItems>
+        </Magazine>
+        <Interfaces name="interfaces" id="if">
+          <Components>
+            <MaterialLoader name="material" id="ml">
+              <DataItems>
+                <!-- Interfaces -->
+                <DataItem type="LOAD_MATERIAL" category="EVENT" id="lm" name="load" />
+                <DataItem type="CHANGE_MATERIAL" category="EVENT" id="cm" name="change" />
+                
+                <!-- Events -->
+                <DataItem type="SPINDLE_INTERLOCK" category="EVENT" id="si" name="s_inter" />
+              </DataItems>
+            </MaterialLoader>
+          </Components>
+        </Interfaces>
+      </Components>
+    </Device>
+    <Device uuid="CNC-000" name="cnc" sampleRate="10.0" id="c">
+      <Description manufacturer="Okuma" serialNumber=""/>
+      <DataItems>
+	      <DataItem type="AVAILABILITY" category="EVENT" id="avail2" name="avail"/>
+        <DataItem type="SYSTEM" category="CONDITION" id="sy2" name="system" />
+      </DataItems>
+      <Components>
+        <Axes name="axes" id="ax">
+          <Components>
+            <Rotary name="C" id="cax">
+              <DataItems>
+                <DataItem type="CHUCK_STATE" category="EVENT" id="cs" name="chuck_state" />
+              </DataItems>
+            </Rotary>
+          </Components>
+        </Axes>
+        <Controller name="Controller" id="cont">
+          <DataItems>
+        		<DataItem type="CONTROLLER_MODE" category="EVENT" id="mode2" name="mode"/>
+        		<DataItem type="EXECUTION" category="EVENT" id="exec2" name="exec"/>
+          </DataItems>
+        </Controller>
+        <Interfaces name="interfaces" id="if2">
+          <Components>
+            <MaterialLoader name="material" id="ml2">
+              <DataItems>
+                <!-- Interfaces -->
+                <DataItem type="LOAD_MATERIAL" category="EVENT" id="lm2" name="load_mat" />
+                <DataItem type="CHANGE_MATERIAL" category="EVENT" id="cm2" name="change_mat" />
+                
+                <DataItem type="LINK_STATE" category="EVENT" id="ls" name="bf_link" />
+              </DataItems>
+            </MaterialLoader>
+          </Components>
+        </Interfaces>
+      </Components>
+    </Device>
+  </Devices>
+</MTConnectDevices>

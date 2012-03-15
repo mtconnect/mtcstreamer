@@ -17,6 +17,7 @@ namespace Streamer
         MTConnect.MTConnectStream stream = new MTConnect.MTConnectStream();
         MTConnect.MTCAdapter adapter = new MTConnect.MTCAdapter();
         Uri mUri;
+        AnyBusMonitor mAnyBus = null;
 
         delegate void SetTextCallback(string text);
         delegate void ErrorCallback(object sender, MTConnect.ErrorArgs args);
@@ -42,7 +43,7 @@ namespace Streamer
             }
             else if (element.Name.LocalName == "SpindleInterlock")
             {
-                this.iSPOK.Checked = element.Value == "ACTIVE";
+                this.iSPOK.Checked = element.Value == "UNLATCHED";
                 this.spindleInterlock.Text = element.Value;
             }
             else
@@ -54,15 +55,37 @@ namespace Streamer
         private void HandleInterface(XElement node)
         {
             bool completed = node.Value == "COMPLETE";
+            bool failed = node.Value == "FAIL";
             if (node.Name.LocalName == "LoadMaterial")
             {
                 this.iMATADV.Checked = completed;
                 this.loadMaterial.Text = node.Value;
+                if (failed)
+                {
+                    this.mAnyBus.ADVFail = true;
+                    Update();
+                }
+                else
+                {
+                    this.mAnyBus.ADVFail = false;
+                    Update();
+                }
+
             }
             else if (node.Name.LocalName == "ChangeMaterial")
             {
                 this.iMATCHG.Checked = completed;
                 this.changeMaterial.Text = node.Value;
+                if (failed)
+                {
+                    this.mAnyBus.CHGFail = true;
+                    Update();
+                }
+                else
+                {
+                    this.mAnyBus.CHGFail = false;
+                    Update();
+                }
             }
             else
             {
@@ -163,6 +186,9 @@ namespace Streamer
 
         private void startButton_Click(object sender, EventArgs e)
         {
+            if (mAnyBus == null)
+                mAnyBus = new AnyBusMonitor(adapter);
+
             String b = url.Text;
             if (!b.EndsWith("/")) b = b + "/";
 
@@ -182,12 +208,60 @@ namespace Streamer
 
             adapter.Port = Convert.ToInt32(adapterPort.Text);
             adapter.Start();
+
+            mAnyBus.Start();
         }
 
-        // Monitor AnyBus bits to activate bar feeder...
-        private void Monitor(object sender, EventArgs e)
+        // Update output status
+        private void UpdateOutput()
         {
-            //adapter.Send(text);
+            oLinkMode.Text = mAnyBus.LinkMode;
+            oLoadMaterial.Text = mAnyBus.Load;
+            oChangeMaterial.Text = mAnyBus.Change;
+            oChuckState.Text = mAnyBus.Chuck;
+            oSystem.Text = mAnyBus.System;
+        }
+
+        private void oBFCDM_CheckedChanged(object sender, EventArgs e)
+        {
+            mAnyBus.oBFCDM = oBFCDM.Checked;
+            Update();
+        }
+
+        private void oALMAB_B_CheckedChanged(object sender, EventArgs e)
+        {
+            mAnyBus.oALMAB_B = oALMAB_B.Checked;
+            Update();
+        }
+
+        private void oMATCHG_CheckedChanged(object sender, EventArgs e)
+        {
+            mAnyBus.oMATCHG = oMATCHG.Checked;
+            Update();
+        }
+
+        private void oMATADV_CheckedChanged(object sender, EventArgs e)
+        {
+            mAnyBus.oMATADV = oMATADV.Checked;
+            Update();
+        }
+
+        private void oBFCHOP_CheckedChanged(object sender, EventArgs e)
+        {
+            mAnyBus.oBFCHOP = oBFCHOP.Checked;
+            Update();
+        }
+
+        private void oBFCHCL_CheckedChanged(object sender, EventArgs e)
+        {
+            mAnyBus.oBFCHCL = oBFCHCL.Checked;
+            Update();
+        }
+
+        private void Update()
+        {
+            mAnyBus.UpdateDevices();
+            UpdateOutput();
         }
     }
 }

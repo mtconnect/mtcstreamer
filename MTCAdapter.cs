@@ -83,7 +83,7 @@ namespace MTConnect
             DateTime now = DateTime.UtcNow;
             String timestamp = now.ToString("yyyy-MM-dd\\THH:mm:ss.fffffffK|");
             ASCIIEncoding encoder = new ASCIIEncoding();
-            String line = timestamp + aText;
+            String line = timestamp + aText + "\n";
             byte[] message = encoder.GetBytes(line.ToCharArray());
 
             foreach (object obj in mClients) {
