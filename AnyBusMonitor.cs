@@ -35,6 +35,7 @@ namespace Streamer
         private MTCDataItem mChuck = new MTCDataItem("chuck_state");
         private MTCDataItem mSystem = new MTCDataItem("system");
         private MTCDataItem mLinkMode = new MTCDataItem("bf_link");
+        private MTCDataItem mAvail = new MTCDataItem("avail");
 
         public string Load { get { return mLoad.Value; } }
         public string Change { get { return mChange.Value; } }
@@ -46,6 +47,7 @@ namespace Streamer
         {
             mAdapter = adapter;
             ADVFail = CHGFail = false;
+            mAvail.Value = "AVAILABLE";
         }
 
         public void UpdateDevices()
@@ -63,14 +65,6 @@ namespace Streamer
                     mChange.Value = oMATCHG ? "ACTIVE" : "READY";
                 }
                 mLinkMode.Value = "ENABLED";
-                mSystem.Value = oALMAB_B ? "normal||||" : "fault||||Alarm A or B";
-
-                if (oBFCHOP)
-                    mChuck.Value = "OPEN";
-                else if (oBFCHCL)
-                    mChuck.Value = "CLOSED";
-                else
-                    mChuck.Value = "UNLATCHED";
             }
             else
             {
@@ -79,12 +73,24 @@ namespace Streamer
                 mLinkMode.Value = "DISABLED";
             }
 
+
+            if (oBFCHOP && !oBFCHCL)
+                mChuck.Value = "OPEN";
+            else if (oBFCHCL && !oBFCHOP)
+                mChuck.Value = "CLOSED";
+            else
+                mChuck.Value = "UNLATCHED";
+
+            mSystem.Value = oALMAB_B ? "normal||||" : "fault||||Alarm A or B";
+            mAvail.Value = "AVAILABLE";
+
             // Send changed data...
             mAdapter.Send(mLoad);
             mAdapter.Send(mChange);
             mAdapter.Send(mChuck);
             mAdapter.Send(mSystem);
             mAdapter.Send(mLinkMode);
+            mAdapter.Send(mAvail);
         }
     }
 }

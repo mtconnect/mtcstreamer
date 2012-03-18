@@ -61,12 +61,14 @@ namespace Streamer
                 this.iMATADV.Checked = completed;
                 this.loadMaterial.Text = node.Value;
                 this.mAnyBus.ADVFail = failed;
+                this.loadFail.Checked = failed;
             }
             else if (node.Name.LocalName == "ChangeMaterial")
             {
                 this.iMATCHG.Checked = completed;
                 this.changeMaterial.Text = node.Value;
                 this.mAnyBus.CHGFail = failed;
+                this.changeFail.Checked = failed;
             }
             else
             {
