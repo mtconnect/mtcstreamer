@@ -17,8 +17,6 @@ namespace Streamer
     public class AnyBusMonitor
     {
         private MTCAdapter mAdapter;
-        private Thread mAnyBusThread;
-        private bool mRunning = false;
 
         // These are the signals from the CNC
         public bool oMATADV { get; set; }
@@ -55,13 +53,10 @@ namespace Streamer
             // Get states from anybus...
             if (oBFCDM)
             {
-                if (ADVFail || CHGFail)
-                {
-                    if (ADVFail)
-                        mLoad.Value = "FAIL";
-                    else if (CHGFail)
-                        mChange.Value = "FAIL";
-                }
+                if (ADVFail)
+                    mLoad.Value = "FAIL";
+                else if (CHGFail)
+                    mChange.Value = "FAIL";
                 else
                 {
                     mLoad.Value = oMATADV ? "ACTIVE" : "READY";
@@ -91,17 +86,5 @@ namespace Streamer
             mAdapter.Send(mSystem);
             mAdapter.Send(mLinkMode);
         }
-
-        public void Start()
-        {
-            // ... when we have a real Ethernet IP
-            mRunning = true;
-        }
-
-        public void Stop()
-        {
-            mRunning = false;
-        }
-
     }
 }

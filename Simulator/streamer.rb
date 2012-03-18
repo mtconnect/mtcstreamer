@@ -8,6 +8,7 @@ module MTConnect
   class Streamer
     def initialize(url)
       @url = url
+      @reader = nil
     end
     
     def parse(xml, &block)
@@ -18,7 +19,7 @@ module MTConnect
         instance = x.attributes['instanceId'].to_i
       }
       
-      document.each_element('//Events/*|//Samples/*') do |e|
+      document.each_element('//Events/*') do |e|
         block.call(e.name, e.text.to_s)
       end
       document.each_element('//Condition/*') do |e|
@@ -35,49 +36,37 @@ module MTConnect
     
     def stop
       @running = false
+      @reader.join if @reader
     end
 
     def start(&block)
       @running = true
-      Thread.new do
+      @reader = Thread.new do
+        dest = URI.parse(@url)
+
+        path = dest.path
+        path += '/' unless path[-1] == ?/
+        rootPath = path.dup
+
         begin
-          dest = URI.parse(@url)
+          puts "Connecting..."
           client = Net::HTTP.new(dest.host, dest.port)
-
-          path = dest.path
-          path += '/' unless path[-1] == ?/
-          rootPath = path.dup
-
           nxt, instance = current(client, rootPath, &block)
-          puts "Instance Id: #{instance}"
-
-          puts "polling..."
-          begin
-            path = rootPath + "sample?interval=0&count=1000&from=#{nxt}&heartbeat=1000"
-            puller = LongPull.new(client)
-            puller.long_pull(path) do |xml|
-              nxt = parse(xml, &block)
-              break unless @running
-            end
           
-            if @running          
-              puts "Reconnecting"
-              client = Net::HTTP.new(dest.host, dest.port)
-              newNxt, newInstance = current(client, rootPath)
-              if instance != newInstance
-                nxt = newNxt
-                instance = newInstance
-              end
-            end
-          rescue 
-            puts "Error occurred: #{$!}\n retrying..."
-            sleep 1
-          end while @running
+          path = rootPath + "sample?interval=0&count=1000&from=#{nxt}&heartbeat=1000"
+          puller = LongPull.new(client)
+          puller.long_pull(path) do |xml|
+            nxt = parse(xml, &block)
+            break unless @running
+          end
         rescue 
+          block.call('DISCONNECTED', nil)
           puts "Error occurred: #{$!}\n retrying..."
+          puts $!.backtrace.join("\n")
           sleep 1
         end while @running
       end
     end
+    @reader = nil
   end
 end

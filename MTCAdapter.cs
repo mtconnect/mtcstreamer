@@ -66,7 +66,7 @@ namespace MTConnect
         {
             mPort = aPort;
             ASCIIEncoding encoder = new ASCIIEncoding();
-            PONG = encoder.GetBytes("* PONG 10000\n");
+            PONG = encoder.GetBytes("* PONG 1000\n");
         }
 
         public void Send(MTCDataItem aDI)

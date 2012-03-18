@@ -38,6 +38,22 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.stopOperation = new System.Windows.Forms.GroupBox();
+            this.oSystem = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.oLinkMode = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.oChuckState = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.oChangeMaterial = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.oLoadMaterial = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.oBFCHCL = new System.Windows.Forms.CheckBox();
+            this.oBFCHOP = new System.Windows.Forms.CheckBox();
+            this.oMATADV = new System.Windows.Forms.CheckBox();
+            this.oMATCHG = new System.Windows.Forms.CheckBox();
+            this.oALMAB_B = new System.Windows.Forms.CheckBox();
+            this.oBFCDM = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.empty = new System.Windows.Forms.TextBox();
@@ -58,22 +74,8 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
-            this.oBFCHCL = new System.Windows.Forms.CheckBox();
-            this.oBFCHOP = new System.Windows.Forms.CheckBox();
-            this.oMATADV = new System.Windows.Forms.CheckBox();
-            this.oMATCHG = new System.Windows.Forms.CheckBox();
-            this.oALMAB_B = new System.Windows.Forms.CheckBox();
-            this.oBFCDM = new System.Windows.Forms.CheckBox();
-            this.oLoadMaterial = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.oChangeMaterial = new System.Windows.Forms.TextBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.oChuckState = new System.Windows.Forms.TextBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.oLinkMode = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.oSystem = new System.Windows.Forms.TextBox();
-            this.label15 = new System.Windows.Forms.Label();
+            this.loadFail = new System.Windows.Forms.CheckBox();
+            this.changeFail = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -168,6 +170,8 @@
             // 
             // stopOperation
             // 
+            this.stopOperation.Controls.Add(this.changeFail);
+            this.stopOperation.Controls.Add(this.loadFail);
             this.stopOperation.Controls.Add(this.oSystem);
             this.stopOperation.Controls.Add(this.label15);
             this.stopOperation.Controls.Add(this.oLinkMode);
@@ -187,10 +191,161 @@
             this.stopOperation.Controls.Add(this.label10);
             this.stopOperation.Location = new System.Drawing.Point(12, 125);
             this.stopOperation.Name = "stopOperation";
-            this.stopOperation.Size = new System.Drawing.Size(563, 190);
+            this.stopOperation.Size = new System.Drawing.Size(563, 211);
             this.stopOperation.TabIndex = 17;
             this.stopOperation.TabStop = false;
             this.stopOperation.Text = "Update";
+            // 
+            // oSystem
+            // 
+            this.oSystem.Location = new System.Drawing.Point(317, 125);
+            this.oSystem.Name = "oSystem";
+            this.oSystem.ReadOnly = true;
+            this.oSystem.Size = new System.Drawing.Size(226, 20);
+            this.oSystem.TabIndex = 27;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(212, 128);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(75, 13);
+            this.label15.TabIndex = 26;
+            this.label15.Text = "System (Cond)";
+            // 
+            // oLinkMode
+            // 
+            this.oLinkMode.Location = new System.Drawing.Point(317, 99);
+            this.oLinkMode.Name = "oLinkMode";
+            this.oLinkMode.ReadOnly = true;
+            this.oLinkMode.Size = new System.Drawing.Size(226, 20);
+            this.oLinkMode.TabIndex = 25;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(212, 102);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(54, 13);
+            this.label14.TabIndex = 24;
+            this.label14.Text = "LinkMode";
+            // 
+            // oChuckState
+            // 
+            this.oChuckState.Location = new System.Drawing.Point(317, 73);
+            this.oChuckState.Name = "oChuckState";
+            this.oChuckState.ReadOnly = true;
+            this.oChuckState.Size = new System.Drawing.Size(226, 20);
+            this.oChuckState.TabIndex = 23;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(212, 76);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(63, 13);
+            this.label13.TabIndex = 22;
+            this.label13.Text = "ChuckState";
+            // 
+            // oChangeMaterial
+            // 
+            this.oChangeMaterial.Location = new System.Drawing.Point(317, 47);
+            this.oChangeMaterial.Name = "oChangeMaterial";
+            this.oChangeMaterial.ReadOnly = true;
+            this.oChangeMaterial.Size = new System.Drawing.Size(226, 20);
+            this.oChangeMaterial.TabIndex = 21;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(212, 50);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(81, 13);
+            this.label12.TabIndex = 20;
+            this.label12.Text = "ChangeMaterial";
+            // 
+            // oLoadMaterial
+            // 
+            this.oLoadMaterial.Location = new System.Drawing.Point(317, 21);
+            this.oLoadMaterial.Name = "oLoadMaterial";
+            this.oLoadMaterial.ReadOnly = true;
+            this.oLoadMaterial.Size = new System.Drawing.Size(226, 20);
+            this.oLoadMaterial.TabIndex = 19;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(212, 24);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(68, 13);
+            this.label11.TabIndex = 18;
+            this.label11.Text = "LoadMaterial";
+            // 
+            // oBFCHCL
+            // 
+            this.oBFCHCL.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.oBFCHCL.Location = new System.Drawing.Point(10, 137);
+            this.oBFCHCL.Name = "oBFCHCL";
+            this.oBFCHCL.Size = new System.Drawing.Size(175, 17);
+            this.oBFCHCL.TabIndex = 16;
+            this.oBFCHCL.Text = "oBFCHCL - Chuck closed";
+            this.oBFCHCL.UseVisualStyleBackColor = true;
+            this.oBFCHCL.CheckedChanged += new System.EventHandler(this.oBFCHCL_CheckedChanged);
+            // 
+            // oBFCHOP
+            // 
+            this.oBFCHOP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.oBFCHOP.Location = new System.Drawing.Point(10, 114);
+            this.oBFCHOP.Name = "oBFCHOP";
+            this.oBFCHOP.Size = new System.Drawing.Size(175, 17);
+            this.oBFCHOP.TabIndex = 15;
+            this.oBFCHOP.Text = "oBFCHOP - Chuck open";
+            this.oBFCHOP.UseVisualStyleBackColor = true;
+            this.oBFCHOP.CheckedChanged += new System.EventHandler(this.oBFCHOP_CheckedChanged);
+            // 
+            // oMATADV
+            // 
+            this.oMATADV.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.oMATADV.Location = new System.Drawing.Point(10, 91);
+            this.oMATADV.Name = "oMATADV";
+            this.oMATADV.Size = new System.Drawing.Size(175, 17);
+            this.oMATADV.TabIndex = 14;
+            this.oMATADV.Text = "oMATADV - Bar advance";
+            this.oMATADV.UseVisualStyleBackColor = true;
+            this.oMATADV.CheckedChanged += new System.EventHandler(this.oMATADV_CheckedChanged);
+            // 
+            // oMATCHG
+            // 
+            this.oMATCHG.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.oMATCHG.Location = new System.Drawing.Point(10, 68);
+            this.oMATCHG.Name = "oMATCHG";
+            this.oMATCHG.Size = new System.Drawing.Size(175, 17);
+            this.oMATCHG.TabIndex = 13;
+            this.oMATCHG.Text = "oMATCHG - Bar change";
+            this.oMATCHG.UseVisualStyleBackColor = true;
+            this.oMATCHG.CheckedChanged += new System.EventHandler(this.oMATCHG_CheckedChanged);
+            // 
+            // oALMAB_B
+            // 
+            this.oALMAB_B.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.oALMAB_B.Location = new System.Drawing.Point(10, 47);
+            this.oALMAB_B.Name = "oALMAB_B";
+            this.oALMAB_B.Size = new System.Drawing.Size(175, 17);
+            this.oALMAB_B.TabIndex = 12;
+            this.oALMAB_B.Text = "oALMAB_B - Alarm A or B ";
+            this.oALMAB_B.UseVisualStyleBackColor = true;
+            this.oALMAB_B.CheckedChanged += new System.EventHandler(this.oALMAB_B_CheckedChanged);
+            // 
+            // oBFCDM
+            // 
+            this.oBFCDM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.oBFCDM.Location = new System.Drawing.Point(10, 24);
+            this.oBFCDM.Name = "oBFCDM";
+            this.oBFCDM.Size = new System.Drawing.Size(175, 17);
+            this.oBFCDM.TabIndex = 11;
+            this.oBFCDM.Text = "oBFCDM - Machine link mode";
+            this.oBFCDM.UseVisualStyleBackColor = true;
+            this.oBFCDM.CheckedChanged += new System.EventHandler(this.oBFCDM_CheckedChanged);
             // 
             // label10
             // 
@@ -220,7 +375,7 @@
             this.groupBox3.Controls.Add(this.iMATCHG);
             this.groupBox3.Controls.Add(this.iBFANML_B);
             this.groupBox3.Controls.Add(this.iIN24);
-            this.groupBox3.Location = new System.Drawing.Point(12, 341);
+            this.groupBox3.Location = new System.Drawing.Point(12, 353);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(563, 180);
             this.groupBox3.TabIndex = 18;
@@ -389,162 +544,33 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
-            // oBFCHCL
+            // loadFail
             // 
-            this.oBFCHCL.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.oBFCHCL.Location = new System.Drawing.Point(10, 137);
-            this.oBFCHCL.Name = "oBFCHCL";
-            this.oBFCHCL.Size = new System.Drawing.Size(175, 17);
-            this.oBFCHCL.TabIndex = 16;
-            this.oBFCHCL.Text = "oBFCHCL - Chuck closed";
-            this.oBFCHCL.UseVisualStyleBackColor = true;
-            this.oBFCHCL.CheckedChanged += new System.EventHandler(this.oBFCHCL_CheckedChanged);
+            this.loadFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.loadFail.Location = new System.Drawing.Point(10, 160);
+            this.loadFail.Name = "loadFail";
+            this.loadFail.Size = new System.Drawing.Size(175, 17);
+            this.loadFail.TabIndex = 28;
+            this.loadFail.Text = "Load Fail";
+            this.loadFail.UseVisualStyleBackColor = true;
+            this.loadFail.CheckedChanged += new System.EventHandler(this.loadFail_CheckedChanged);
             // 
-            // oBFCHOP
+            // changeFail
             // 
-            this.oBFCHOP.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.oBFCHOP.Location = new System.Drawing.Point(10, 114);
-            this.oBFCHOP.Name = "oBFCHOP";
-            this.oBFCHOP.Size = new System.Drawing.Size(175, 17);
-            this.oBFCHOP.TabIndex = 15;
-            this.oBFCHOP.Text = "oBFCHOP - Chuck open";
-            this.oBFCHOP.UseVisualStyleBackColor = true;
-            this.oBFCHOP.CheckedChanged += new System.EventHandler(this.oBFCHOP_CheckedChanged);
-            // 
-            // oMATADV
-            // 
-            this.oMATADV.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.oMATADV.Location = new System.Drawing.Point(10, 91);
-            this.oMATADV.Name = "oMATADV";
-            this.oMATADV.Size = new System.Drawing.Size(175, 17);
-            this.oMATADV.TabIndex = 14;
-            this.oMATADV.Text = "oMATADV - Bar advance";
-            this.oMATADV.UseVisualStyleBackColor = true;
-            this.oMATADV.CheckedChanged += new System.EventHandler(this.oMATADV_CheckedChanged);
-            // 
-            // oMATCHG
-            // 
-            this.oMATCHG.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.oMATCHG.Location = new System.Drawing.Point(10, 68);
-            this.oMATCHG.Name = "oMATCHG";
-            this.oMATCHG.Size = new System.Drawing.Size(175, 17);
-            this.oMATCHG.TabIndex = 13;
-            this.oMATCHG.Text = "oMATCHG - Bar change";
-            this.oMATCHG.UseVisualStyleBackColor = true;
-            this.oMATCHG.CheckedChanged += new System.EventHandler(this.oMATCHG_CheckedChanged);
-            // 
-            // oALMAB_B
-            // 
-            this.oALMAB_B.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.oALMAB_B.Location = new System.Drawing.Point(10, 47);
-            this.oALMAB_B.Name = "oALMAB_B";
-            this.oALMAB_B.Size = new System.Drawing.Size(175, 17);
-            this.oALMAB_B.TabIndex = 12;
-            this.oALMAB_B.Text = "oALMAB_B - Alarm A or B ";
-            this.oALMAB_B.UseVisualStyleBackColor = true;
-            this.oALMAB_B.CheckedChanged += new System.EventHandler(this.oALMAB_B_CheckedChanged);
-            // 
-            // oBFCDM
-            // 
-            this.oBFCDM.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.oBFCDM.Location = new System.Drawing.Point(10, 24);
-            this.oBFCDM.Name = "oBFCDM";
-            this.oBFCDM.Size = new System.Drawing.Size(175, 17);
-            this.oBFCDM.TabIndex = 11;
-            this.oBFCDM.Text = "oBFCDM - Machine link mode";
-            this.oBFCDM.UseVisualStyleBackColor = true;
-            this.oBFCDM.CheckedChanged += new System.EventHandler(this.oBFCDM_CheckedChanged);
-            // 
-            // oLoadMaterial
-            // 
-            this.oLoadMaterial.Location = new System.Drawing.Point(317, 21);
-            this.oLoadMaterial.Name = "oLoadMaterial";
-            this.oLoadMaterial.ReadOnly = true;
-            this.oLoadMaterial.Size = new System.Drawing.Size(226, 20);
-            this.oLoadMaterial.TabIndex = 19;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(212, 24);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(68, 13);
-            this.label11.TabIndex = 18;
-            this.label11.Text = "LoadMaterial";
-            // 
-            // oChangeMaterial
-            // 
-            this.oChangeMaterial.Location = new System.Drawing.Point(317, 47);
-            this.oChangeMaterial.Name = "oChangeMaterial";
-            this.oChangeMaterial.ReadOnly = true;
-            this.oChangeMaterial.Size = new System.Drawing.Size(226, 20);
-            this.oChangeMaterial.TabIndex = 21;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(212, 50);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(81, 13);
-            this.label12.TabIndex = 20;
-            this.label12.Text = "ChangeMaterial";
-            // 
-            // oChuckState
-            // 
-            this.oChuckState.Location = new System.Drawing.Point(317, 73);
-            this.oChuckState.Name = "oChuckState";
-            this.oChuckState.ReadOnly = true;
-            this.oChuckState.Size = new System.Drawing.Size(226, 20);
-            this.oChuckState.TabIndex = 23;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(212, 76);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(63, 13);
-            this.label13.TabIndex = 22;
-            this.label13.Text = "ChuckState";
-            // 
-            // oLinkMode
-            // 
-            this.oLinkMode.Location = new System.Drawing.Point(317, 99);
-            this.oLinkMode.Name = "oLinkMode";
-            this.oLinkMode.ReadOnly = true;
-            this.oLinkMode.Size = new System.Drawing.Size(226, 20);
-            this.oLinkMode.TabIndex = 25;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(212, 102);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(54, 13);
-            this.label14.TabIndex = 24;
-            this.label14.Text = "LinkMode";
-            // 
-            // oSystem
-            // 
-            this.oSystem.Location = new System.Drawing.Point(317, 125);
-            this.oSystem.Name = "oSystem";
-            this.oSystem.ReadOnly = true;
-            this.oSystem.Size = new System.Drawing.Size(226, 20);
-            this.oSystem.TabIndex = 27;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(212, 128);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(75, 13);
-            this.label15.TabIndex = 26;
-            this.label15.Text = "System (Cond)";
+            this.changeFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.changeFail.Location = new System.Drawing.Point(10, 183);
+            this.changeFail.Name = "changeFail";
+            this.changeFail.Size = new System.Drawing.Size(175, 17);
+            this.changeFail.TabIndex = 29;
+            this.changeFail.Text = "Change Fail";
+            this.changeFail.UseVisualStyleBackColor = true;
+            this.changeFail.CheckedChanged += new System.EventHandler(this.changeFail_CheckedChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(593, 587);
+            this.ClientSize = new System.Drawing.Size(593, 549);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
@@ -610,6 +636,8 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox oChangeMaterial;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.CheckBox loadFail;
+        private System.Windows.Forms.CheckBox changeFail;
     }
 }
 

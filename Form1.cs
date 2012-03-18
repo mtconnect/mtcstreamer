@@ -60,37 +60,19 @@ namespace Streamer
             {
                 this.iMATADV.Checked = completed;
                 this.loadMaterial.Text = node.Value;
-                if (failed)
-                {
-                    this.mAnyBus.ADVFail = true;
-                    Update();
-                }
-                else
-                {
-                    this.mAnyBus.ADVFail = false;
-                    Update();
-                }
-
+                this.mAnyBus.ADVFail = failed;
             }
             else if (node.Name.LocalName == "ChangeMaterial")
             {
                 this.iMATCHG.Checked = completed;
                 this.changeMaterial.Text = node.Value;
-                if (failed)
-                {
-                    this.mAnyBus.CHGFail = true;
-                    Update();
-                }
-                else
-                {
-                    this.mAnyBus.CHGFail = false;
-                    Update();
-                }
+                this.mAnyBus.CHGFail = failed;
             }
             else
             {
                 Console.WriteLine("Unknown node: " + node.Name);
             }
+            UpdateOutput();
         }
 
         private void HandleCondition(XElement cond)
@@ -170,6 +152,8 @@ namespace Streamer
                 this.iMATADV.Checked = false;
                 this.iMATCHG.Checked = false;
                 this.iIN24.Checked = false;
+                this.loadFail.Checked = false;
+                this.changeFail.Checked = false;
             }
         }
 
@@ -208,13 +192,13 @@ namespace Streamer
 
             adapter.Port = Convert.ToInt32(adapterPort.Text);
             adapter.Start();
-
-            mAnyBus.Start();
         }
 
         // Update output status
         private void UpdateOutput()
         {
+            mAnyBus.UpdateDevices(); 
+            
             oLinkMode.Text = mAnyBus.LinkMode;
             oLoadMaterial.Text = mAnyBus.Load;
             oChangeMaterial.Text = mAnyBus.Change;
@@ -225,42 +209,48 @@ namespace Streamer
         private void oBFCDM_CheckedChanged(object sender, EventArgs e)
         {
             mAnyBus.oBFCDM = oBFCDM.Checked;
-            Update();
+            UpdateOutput();
         }
 
         private void oALMAB_B_CheckedChanged(object sender, EventArgs e)
         {
             mAnyBus.oALMAB_B = oALMAB_B.Checked;
-            Update();
+            UpdateOutput();
         }
 
         private void oMATCHG_CheckedChanged(object sender, EventArgs e)
         {
             mAnyBus.oMATCHG = oMATCHG.Checked;
-            Update();
+            UpdateOutput();
         }
 
         private void oMATADV_CheckedChanged(object sender, EventArgs e)
         {
             mAnyBus.oMATADV = oMATADV.Checked;
-            Update();
+            UpdateOutput();
         }
 
         private void oBFCHOP_CheckedChanged(object sender, EventArgs e)
         {
             mAnyBus.oBFCHOP = oBFCHOP.Checked;
-            Update();
+            UpdateOutput();
         }
 
         private void oBFCHCL_CheckedChanged(object sender, EventArgs e)
         {
             mAnyBus.oBFCHCL = oBFCHCL.Checked;
-            Update();
+            UpdateOutput();
         }
 
-        private void Update()
+        private void loadFail_CheckedChanged(object sender, EventArgs e)
         {
-            mAnyBus.UpdateDevices();
+            this.mAnyBus.ADVFail = loadFail.Checked;
+            UpdateOutput();
+        }
+
+        private void changeFail_CheckedChanged(object sender, EventArgs e)
+        {
+            this.mAnyBus.CHGFail = changeFail.Checked;
             UpdateOutput();
         }
     }

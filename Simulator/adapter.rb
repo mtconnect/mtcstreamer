@@ -9,7 +9,7 @@ module MTConnect
   class Adapter
     attr_reader :data_items
 
-    def initialize(port = 7878, heartbeat_interval = 10000)
+    def initialize(port = 7878, heartbeat_interval = 1000)
       @port = port
       @heartbeat_interval = heartbeat_interval
       @running = false
@@ -18,10 +18,11 @@ module MTConnect
       @clients = []
       @data_items = []
       @started = ConditionVariable.new
+      @heartbeat = @acceptor = nil
     end
 
     def start
-      Thread.new do
+      @acceptor = Thread.new do
         begin
           server = TCPServer.new(@port)
           @mutex.synchronize do
@@ -50,10 +51,11 @@ module MTConnect
           $logger.error('start') { "Exception occurred: #{$!}\n#{$!.backtrace.join("\n")}" }
         end
       end
+      @acceptor = nil
     end
 
     def heartbeat(client)
-      Thread.new do
+      @heartbeat = Thread.new do
         $logger.debug('heartbeat') { "Starting heartbeat thread for #{client.peeraddr.inspect}" }
         begin
           timeout = nil
@@ -62,7 +64,7 @@ module MTConnect
             if readables != nil
               if (r = client.read_nonblock(256)) =~ /\* PING/
                 timeout = @heartbeat_interval / 500.0
-                $logger.debug('heartbeat') { "Received #{r.strip}, responding with pong" }
+                # $logger.debug('heartbeat') { "Received #{r.strip}, responding with pong" }
                 @mutex.synchronize do
                   client.puts "* PONG #{@heartbeat_interval}"
                 end
@@ -82,6 +84,7 @@ module MTConnect
           remove_client(client)
         end
       end
+      @heartbeat = nil
     end
 
     def stop
@@ -93,6 +96,14 @@ module MTConnect
       @mutex.synchronize do
         @clients.each { |client| client.close }
         @clients.clear
+      end
+      if @acceptor
+        @acceptor.raise RuntimeException, 'Stopped'
+        @acceptor.join if @acceptor
+      end
+      if @heartbeat
+        @heartbeat.raise RuntimeException, 'Stopped'
+        @heartbeat.join if @heartbeat
       end
     end
 
