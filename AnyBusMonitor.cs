@@ -63,8 +63,7 @@ namespace Streamer
                 {
                     mLoad.Value = oMATADV ? "ACTIVE" : "READY";
                     mChange.Value = oMATCHG ? "ACTIVE" : "READY";
-                }
-                mLinkMode.Value = "ENABLED";
+                }   
             }
             else
             {
@@ -83,6 +82,7 @@ namespace Streamer
 
             mSystem.Value = oALMAB_B ? "normal||||" : "fault||||Alarm A or B";
             mAvail.Value = "AVAILABLE";
+            mLinkMode.Value = oBFCDM ? "ENABLED" : "DISABLED";
 
             // Send changed data...
             mAdapter.Send(mLoad);

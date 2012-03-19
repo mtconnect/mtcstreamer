@@ -46,6 +46,14 @@ namespace Streamer
                 this.iSPOK.Checked = element.Value == "UNLATCHED";
                 this.spindleInterlock.Text = element.Value;
             }
+            else if (element.Name.LocalName == "RemainingMaterial")
+            {
+                this.stock.Text = element.Value;
+            }
+            else if (element.Name.LocalName == "BarLength")
+            {
+                this.barLength.Text = element.Value;
+            }
             else
             {
                 Console.WriteLine("Unknown node: " + element.Name);
@@ -83,7 +91,7 @@ namespace Streamer
                     cond.Name.LocalName != "Unavailable";
             if (cond.Attribute("type").Value == "FILL_LEVEL")
             {
-                this.empty.Text = cond.Value;
+                this.empty.Text = cond.Name.LocalName + " - " + cond.Value;
                 this.iNMCY_B.Checked = active;
             }
             else 
@@ -154,8 +162,22 @@ namespace Streamer
                 this.iMATADV.Checked = false;
                 this.iMATCHG.Checked = false;
                 this.iIN24.Checked = false;
+                this.iSPOK.Checked = false;
                 this.loadFail.Checked = false;
                 this.changeFail.Checked = false;
+
+                oBFCDM.Checked = false;
+                mAnyBus.oBFCDM = false;
+                UpdateOutput();
+
+                this.endOfBar.Text = "";
+                this.loadMaterial.Text = "";
+                this.spindleInterlock.Text = "";
+                this.stock.Text = "";
+                this.barLength.Text = "";
+                this.changeMaterial.Text = "";
+                this.empty.Text = "";
+                this.condition.Text = "";
             }
         }
 

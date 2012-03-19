@@ -20,6 +20,7 @@
           <DataItems>
             <DataItem type="FILL_LEVEL" category="CONDITION" id="fl" name="fill" />
             <DataItem type="REMAINING_MATERIAL" category="EVENT" id="rm" name="remain" />
+            <DataItem type="BAR_LENGTH" category="EVENT" id="lth" name="length" />
           </DataItems>
         </Magazine>
         <Interfaces name="interfaces" id="if">

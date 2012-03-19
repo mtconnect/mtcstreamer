@@ -85,7 +85,7 @@ namespace MTConnect
             ASCIIEncoding encoder = new ASCIIEncoding();
             String line = timestamp + aText + "\n";
             byte[] message = encoder.GetBytes(line.ToCharArray());
-
+            Console.WriteLine("Sending: " + line);
             foreach (object obj in mClients) {
                 NetworkStream client = (NetworkStream) obj;
                 lock (client)
@@ -102,7 +102,7 @@ namespace MTConnect
             {
                 lock (aClient)
                 {
-                    Console.WriteLine("Received PING, sending PONG");
+                    // Console.WriteLine("Received PING, sending PONG");
                     aClient.Write(PONG, 0, PONG.Length);
                     aClient.Flush();
                 }

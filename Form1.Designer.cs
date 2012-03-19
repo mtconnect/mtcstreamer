@@ -38,6 +38,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.stopOperation = new System.Windows.Forms.GroupBox();
+            this.changeFail = new System.Windows.Forms.CheckBox();
+            this.loadFail = new System.Windows.Forms.CheckBox();
             this.oSystem = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.oLinkMode = new System.Windows.Forms.TextBox();
@@ -74,8 +76,10 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
-            this.loadFail = new System.Windows.Forms.CheckBox();
-            this.changeFail = new System.Windows.Forms.CheckBox();
+            this.barLength = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.stock = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -195,6 +199,28 @@
             this.stopOperation.TabIndex = 17;
             this.stopOperation.TabStop = false;
             this.stopOperation.Text = "Update";
+            // 
+            // changeFail
+            // 
+            this.changeFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.changeFail.Location = new System.Drawing.Point(10, 183);
+            this.changeFail.Name = "changeFail";
+            this.changeFail.Size = new System.Drawing.Size(175, 17);
+            this.changeFail.TabIndex = 29;
+            this.changeFail.Text = "Change Fail";
+            this.changeFail.UseVisualStyleBackColor = true;
+            this.changeFail.CheckedChanged += new System.EventHandler(this.changeFail_CheckedChanged);
+            // 
+            // loadFail
+            // 
+            this.loadFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.loadFail.Location = new System.Drawing.Point(10, 160);
+            this.loadFail.Name = "loadFail";
+            this.loadFail.Size = new System.Drawing.Size(175, 17);
+            this.loadFail.TabIndex = 28;
+            this.loadFail.Text = "Load Fail";
+            this.loadFail.UseVisualStyleBackColor = true;
+            this.loadFail.CheckedChanged += new System.EventHandler(this.loadFail_CheckedChanged);
             // 
             // oSystem
             // 
@@ -357,6 +383,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.stock);
+            this.groupBox3.Controls.Add(this.label17);
+            this.groupBox3.Controls.Add(this.barLength);
+            this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.empty);
             this.groupBox3.Controls.Add(this.spindleInterlock);
             this.groupBox3.Controls.Add(this.loadMaterial);
@@ -377,7 +407,7 @@
             this.groupBox3.Controls.Add(this.iIN24);
             this.groupBox3.Location = new System.Drawing.Point(12, 353);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(563, 180);
+            this.groupBox3.Size = new System.Drawing.Size(563, 226);
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Bar Feeder Status";
@@ -544,33 +574,45 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
-            // loadFail
+            // barLength
             // 
-            this.loadFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.loadFail.Location = new System.Drawing.Point(10, 160);
-            this.loadFail.Name = "loadFail";
-            this.loadFail.Size = new System.Drawing.Size(175, 17);
-            this.loadFail.TabIndex = 28;
-            this.loadFail.Text = "Load Fail";
-            this.loadFail.UseVisualStyleBackColor = true;
-            this.loadFail.CheckedChanged += new System.EventHandler(this.loadFail_CheckedChanged);
+            this.barLength.Location = new System.Drawing.Point(317, 168);
+            this.barLength.Name = "barLength";
+            this.barLength.ReadOnly = true;
+            this.barLength.Size = new System.Drawing.Size(226, 20);
+            this.barLength.TabIndex = 24;
             // 
-            // changeFail
+            // label16
             // 
-            this.changeFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.changeFail.Location = new System.Drawing.Point(10, 183);
-            this.changeFail.Name = "changeFail";
-            this.changeFail.Size = new System.Drawing.Size(175, 17);
-            this.changeFail.TabIndex = 29;
-            this.changeFail.Text = "Change Fail";
-            this.changeFail.UseVisualStyleBackColor = true;
-            this.changeFail.CheckedChanged += new System.EventHandler(this.changeFail_CheckedChanged);
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(212, 169);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(40, 13);
+            this.label16.TabIndex = 23;
+            this.label16.Text = "Length";
+            // 
+            // stock
+            // 
+            this.stock.Location = new System.Drawing.Point(317, 194);
+            this.stock.Name = "stock";
+            this.stock.ReadOnly = true;
+            this.stock.Size = new System.Drawing.Size(226, 20);
+            this.stock.TabIndex = 26;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(212, 195);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(35, 13);
+            this.label17.TabIndex = 25;
+            this.label17.Text = "Stock";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(593, 549);
+            this.ClientSize = new System.Drawing.Size(593, 608);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
@@ -638,6 +680,10 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.CheckBox loadFail;
         private System.Windows.Forms.CheckBox changeFail;
+        private System.Windows.Forms.TextBox stock;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox barLength;
+        private System.Windows.Forms.Label label16;
     }
 }
 
