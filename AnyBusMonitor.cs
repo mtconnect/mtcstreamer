@@ -53,7 +53,7 @@ namespace Streamer
         public void UpdateDevices()
         {
             // Get states from anybus...
-            if (oBFCDM)
+            if (oBFCDM && oALMAB_B)
             {
                 if (ADVFail)
                     mLoad.Value = "FAIL";

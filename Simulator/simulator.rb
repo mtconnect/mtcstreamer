@@ -19,15 +19,14 @@ end
 # Command processor
 while true
   begin
-    print '> '; STDOUT.flush
-    line = Readline.readline
-    next if line.empty?
-    
-    if line == 'quit'
+    line = Readline.readline('> ', true)    
+    if line.nil? or line == 'quit'
       context.stop
       streamer.stop
       exit 0
     end
+    next if line.empty?
+    
     # send the line as an event...
     event = line.strip.to_sym
     if BarFeeder.bar_feeder.respond_to? event

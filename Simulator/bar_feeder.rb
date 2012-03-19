@@ -68,6 +68,7 @@ module BarFeeder
     end
   
     def event(name, value)
+      puts "Received #{name} #{value}"
       case name 
       when "Fault"
         @faults[value] = true
@@ -91,7 +92,7 @@ module BarFeeder
       end
     end
   
-    def begin_loading
+    def begin_load_material
       unless @chuck_open
         @statemachine.chuck_state_closed
       else
@@ -107,7 +108,7 @@ module BarFeeder
       end
     end
   
-    def begin_changing
+    def begin_change_material
       @adapter.gather do 
         @change_material_di.value = 'ACTIVE'
         add_conditions
@@ -143,7 +144,7 @@ module BarFeeder
       end
     end
 
-    def load_completed
+    def load_material_completed
       @remaining_length -= @part_length
       puts "*** Remaining length: #{@remaining_length}"
       @adapter.gather do 
@@ -156,7 +157,7 @@ module BarFeeder
       end
     end
   
-    def change_completed
+    def change_material_completed
       @adapter.gather do 
         @change_material_di.value = 'COMPLETE'
         @end_of_bar_di.value = 'READY'
@@ -192,18 +193,12 @@ module BarFeeder
     end
   
     def chuck_open
-      @adapter.gather do 
-        @load_material_di.value = 'READY'
-        @chuck_open = true
-      end
+      @chuck_open = true
       @statemachine.activate
     end
   
     def chuck_not_open
-      @adapter.gather do 
-        @load_material_di.value = 'NOT_READY'
-        @chuck_open = false
-      end
+      @chuck_open = false
       @statemachine.activate
     end
   end
@@ -269,74 +264,57 @@ module BarFeeder
       superstate :operational do
         startstate :ready
         default_history :ready
-    
+        
         state :ready do
           default :ready
           on_entry :interfaces_ready
-      
-          event :load_material_active, :load_material
-          event :change_material_active, :change_material
         end
+                
+        [:load_material, :change_material].each do |interface|
+          active = "#{interface}_active".to_sym
+          fail = "#{interface}_fail".to_sym
+          failed = "#{interface}_failed".to_sym
+          complete = "#{interface}_complete".to_sym
+          completed = "#{interface}_completed".to_sym
+          ready = "#{interface}_ready".to_sym
+          cnc_fail = "cnc_#{interface}_fail".to_sym
+          
+          trans :ready, active, interface
+              
+          state interface do
+            on_entry "begin_#{interface}".to_sym
+            event ready, fail
+            event completed, complete
+            event fail, cnc_fail          
+          end
     
-        state :load_material do
-          on_entry :begin_loading
-          event :chuck_state_closed, :load_material_fail
-          event :chuck_state_unlatched, :load_material_fail
-          event :load_material_ready, :load_material_fail
-          event :load_material_completed, :load_material_complete
-          event :load_material_fail, :cnc_load_failed          
-        end
+          # Handle invalid CNC state change in which we will respond with a fail
+          # This requires CNC ack the fail with a FAIL. When we get the fail, we
+          # transition to a ready
+          state fail do
+            on_entry failed
+            default fail
+            event fail, :ready
+          end
     
-        state :change_material do
-          on_entry :begin_changing
-          event :change_material_ready, :change_material_fail
-          event :change_material_completed, :change_material_complete
-          event :change_material_fail, :cnc_change_failed    
-        end
+          # Handle CNC failing current operation. We should
+          # only get here when we are operational and active.
+          state cnc_fail do 
+            on_entry failed
+            default cnc_fail
+            event ready, :ready
+          end
+          
+          event fail, cnc_fail
     
-        # Handle invalid CNC state change in which we will respond with a fail
-        # This requires CNC ack the fail with a FAIL. When we get the fail, we
-        # transition to a ready
-        state :load_material_fail do
-          on_entry :load_material_failed
-          default :load_material_fail
-          event :load_material_fail, :ready
+          # These will auto transition to complete unless they fail.
+          state complete do
+            on_entry completed
+            default complete
+            event ready, :ready
+          end
         end
-    
-        state :change_material_fail do
-          on_entry :change_material_failed
-          default :change_material_fail
-          event :change_material_fail, :ready
-        end
-    
-        # Handle CNC failing current operation. We should
-        # only get here when we are operational and active.
-        state :cnc_load_failed do 
-          on_entry :load_material_failed
-          default :cnc_load_failed
-          event :load_material_ready, :ready
-        end
-    
-        state :cnc_change_failed do 
-          on_entry :change_material_failed
-          default :cnc_change_failed
-          event :change_material_ready, :ready
-        end
-
-        # These will auto transition to complete unless they fail.
-        state :load_material_complete do
-          on_entry :load_completed
-          default :load_material_complete
-          event :load_material_ready, :ready
-          event :bar_finished, :end_of_bar
-        end
-    
-        state :change_material_complete do
-          on_entry :change_completed
-          default :change_material_complete
-          event :change_material_ready, :ready
-        end
-    
+        
         # End of bar state, end of bar is active and we need a change bar 
         # event
         state :end_of_bar do
@@ -345,23 +323,24 @@ module BarFeeder
           event :load_material_active, :load_material_fail_eob
           event :change_material_active, :change_material
         end
-    
+  
         state :load_material_fail_eob do
           on_entry :load_material_failed
           default :load_material_fail_eob
           event :load_material_fail, :end_of_bar
         end
-    
-        # Super fail events
-        event :load_material_fail, :cnc_load_failed
-        event :change_material_fail, :cnc_load_failed
-    
+        
+        # A few other states
+        trans :load_material, :chuck_state_closed, :load_material_fail
+        trans :load_material, :chuck_state_unlatched, :load_material_fail
+        trans :load_material_complete, :bar_finished, :end_of_bar
+        
         # handle some failure conditions
         event :disconnected, :not_ready
         event :fault, :fault, :faulted
         event :link_state_unavailable, :not_ready
         event :link_state_disabled, :not_ready
-        event :availability_unavailable, :not_ready    
+        event :availability_unavailable, :not_ready            
       end
     end
   
