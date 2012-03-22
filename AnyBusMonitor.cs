@@ -27,6 +27,7 @@ namespace Streamer
         public bool oBFCHCL { get; set; }
         public bool ADVFail { get; set; }
         public bool CHGFail { get; set; }
+        public bool topCut { get; set; }
 
         // Define the data items we're mirroring with these 
         // output variables
@@ -36,8 +37,10 @@ namespace Streamer
         private MTCDataItem mSystem = new MTCDataItem("system");
         private MTCDataItem mLinkMode = new MTCDataItem("bf_link");
         private MTCDataItem mAvail = new MTCDataItem("avail");
+        private MTCDataItem mTopCut = new MTCDataItem("top_cut");
 
         public string Load { get { return mLoad.Value; } }
+        public string TopCut { get { return mTopCut.Value; } }
         public string Change { get { return mChange.Value; } }
         public string Chuck { get { return mChuck.Value; } }
         public string System { get { return mSystem.Value; } }
@@ -46,8 +49,9 @@ namespace Streamer
         public AnyBusMonitor(MTCAdapter adapter)
         {
             mAdapter = adapter;
-            ADVFail = CHGFail = false;
+            ADVFail = CHGFail = topCut = false;
             mAvail.Value = "AVAILABLE";
+            mTopCut.Value = "READY";
         }
 
         public void UpdateDevices()
@@ -61,6 +65,13 @@ namespace Streamer
                     mChange.Value = "FAIL";
                 else
                 {
+                    if (topCut && oMATADV)
+                        mTopCut.Value = "COMPLETE";
+                    else if (topCut)
+                        mTopCut.Value = "ACTIVE";
+                    else
+                        mTopCut.Value = "READY";
+
                     mLoad.Value = oMATADV ? "ACTIVE" : "READY";
                     mChange.Value = oMATCHG ? "ACTIVE" : "READY";
                 }   
@@ -85,6 +96,7 @@ namespace Streamer
             mLinkMode.Value = oBFCDM ? "ENABLED" : "DISABLED";
 
             // Send changed data...
+            mAdapter.Send(mTopCut);
             mAdapter.Send(mLoad);
             mAdapter.Send(mChange);
             mAdapter.Send(mChuck);

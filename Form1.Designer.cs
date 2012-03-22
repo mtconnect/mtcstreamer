@@ -38,6 +38,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.stopOperation = new System.Windows.Forms.GroupBox();
+            this.oTopCut = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
             this.changeFail = new System.Windows.Forms.CheckBox();
             this.loadFail = new System.Windows.Forms.CheckBox();
             this.oSystem = new System.Windows.Forms.TextBox();
@@ -58,6 +60,13 @@
             this.oBFCDM = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.topCut = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.iTOPCUT = new System.Windows.Forms.CheckBox();
+            this.stock = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.barLength = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.empty = new System.Windows.Forms.TextBox();
             this.spindleInterlock = new System.Windows.Forms.TextBox();
             this.loadMaterial = new System.Windows.Forms.TextBox();
@@ -76,10 +85,6 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
-            this.barLength = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.stock = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -174,6 +179,8 @@
             // 
             // stopOperation
             // 
+            this.stopOperation.Controls.Add(this.oTopCut);
+            this.stopOperation.Controls.Add(this.label19);
             this.stopOperation.Controls.Add(this.changeFail);
             this.stopOperation.Controls.Add(this.loadFail);
             this.stopOperation.Controls.Add(this.oSystem);
@@ -199,6 +206,23 @@
             this.stopOperation.TabIndex = 17;
             this.stopOperation.TabStop = false;
             this.stopOperation.Text = "Update";
+            // 
+            // oTopCut
+            // 
+            this.oTopCut.Location = new System.Drawing.Point(317, 153);
+            this.oTopCut.Name = "oTopCut";
+            this.oTopCut.ReadOnly = true;
+            this.oTopCut.Size = new System.Drawing.Size(226, 20);
+            this.oTopCut.TabIndex = 27;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(212, 156);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(42, 13);
+            this.label19.TabIndex = 26;
+            this.label19.Text = "TopCut";
             // 
             // changeFail
             // 
@@ -383,6 +407,9 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.topCut);
+            this.groupBox3.Controls.Add(this.label18);
+            this.groupBox3.Controls.Add(this.iTOPCUT);
             this.groupBox3.Controls.Add(this.stock);
             this.groupBox3.Controls.Add(this.label17);
             this.groupBox3.Controls.Add(this.barLength);
@@ -407,10 +434,71 @@
             this.groupBox3.Controls.Add(this.iIN24);
             this.groupBox3.Location = new System.Drawing.Point(12, 353);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(563, 226);
+            this.groupBox3.Size = new System.Drawing.Size(563, 243);
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Bar Feeder Status";
+            // 
+            // topCut
+            // 
+            this.topCut.Location = new System.Drawing.Point(317, 218);
+            this.topCut.Name = "topCut";
+            this.topCut.ReadOnly = true;
+            this.topCut.Size = new System.Drawing.Size(226, 20);
+            this.topCut.TabIndex = 29;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(212, 219);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(45, 13);
+            this.label18.TabIndex = 28;
+            this.label18.Text = "Top Cut";
+            // 
+            // iTOPCUT
+            // 
+            this.iTOPCUT.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.iTOPCUT.Location = new System.Drawing.Point(10, 163);
+            this.iTOPCUT.Name = "iTOPCUT";
+            this.iTOPCUT.Size = new System.Drawing.Size(175, 17);
+            this.iTOPCUT.TabIndex = 27;
+            this.iTOPCUT.Text = "iTOPCUT - Top Cut";
+            this.iTOPCUT.UseVisualStyleBackColor = true;
+            // 
+            // stock
+            // 
+            this.stock.Location = new System.Drawing.Point(317, 194);
+            this.stock.Name = "stock";
+            this.stock.ReadOnly = true;
+            this.stock.Size = new System.Drawing.Size(226, 20);
+            this.stock.TabIndex = 26;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(212, 195);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(35, 13);
+            this.label17.TabIndex = 25;
+            this.label17.Text = "Stock";
+            // 
+            // barLength
+            // 
+            this.barLength.Location = new System.Drawing.Point(317, 168);
+            this.barLength.Name = "barLength";
+            this.barLength.ReadOnly = true;
+            this.barLength.Size = new System.Drawing.Size(226, 20);
+            this.barLength.TabIndex = 24;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(212, 169);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(40, 13);
+            this.label16.TabIndex = 23;
+            this.label16.Text = "Length";
             // 
             // empty
             // 
@@ -574,40 +662,6 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
-            // barLength
-            // 
-            this.barLength.Location = new System.Drawing.Point(317, 168);
-            this.barLength.Name = "barLength";
-            this.barLength.ReadOnly = true;
-            this.barLength.Size = new System.Drawing.Size(226, 20);
-            this.barLength.TabIndex = 24;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(212, 169);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(40, 13);
-            this.label16.TabIndex = 23;
-            this.label16.Text = "Length";
-            // 
-            // stock
-            // 
-            this.stock.Location = new System.Drawing.Point(317, 194);
-            this.stock.Name = "stock";
-            this.stock.ReadOnly = true;
-            this.stock.Size = new System.Drawing.Size(226, 20);
-            this.stock.TabIndex = 26;
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(212, 195);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(35, 13);
-            this.label17.TabIndex = 25;
-            this.label17.Text = "Stock";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -684,6 +738,11 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox barLength;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox topCut;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.CheckBox iTOPCUT;
+        private System.Windows.Forms.TextBox oTopCut;
+        private System.Windows.Forms.Label label19;
     }
 }
 

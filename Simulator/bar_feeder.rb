@@ -33,6 +33,7 @@ module BarFeeder
       @adapter.data_items << (@length_di = DataItem.new('length'))
       @adapter.data_items << (@system_di = Condition.new('system'))
       @adapter.data_items << (@fill_di = Condition.new('fill'))
+      @adapter.data_items << (@top_cut_di = DataItem.new('top_cut'))
     
       @availability_di.value = "AVAILABLE"
       @exec_di.value = 'READY'
@@ -45,6 +46,8 @@ module BarFeeder
       @system_di.normal
       @mag_empty = false
       @failed = false
+      @connected = false
+      @top_cut_di.value = 'READY'
         
       @adapter.start    
     end
@@ -58,6 +61,9 @@ module BarFeeder
         @fill_di.add('fault', 'magazine empty', '1', 'LOW')
       elsif @remaining_material <= 2
         @fill_di.add('warning', 'magazine low', '2', 'LOW')
+      end
+      unless @connected
+        @system_di.add('fault', 'CNC has disconnected', '3')
       end
     end
   
@@ -77,15 +83,22 @@ module BarFeeder
       when "Fault"
         @faults[value] = true
         @statemachine.fault
+        @connected = true
       
       when 'Warning', 'Normal'
         @faults.delete(value)
         @statemachine.normal if @faults.empty?
+        @connected = true
             
       when 'DISCONNECTED'
         @statemachine.disconnected
+        @connected = false
+        @adapter.gather do 
+          add_conditions
+        end
       
       else
+        @connected = true
         element = name.split(/([A-Z][a-z]+)/).delete_if(&:empty?).map(&:downcase).join('_')
         mth = "#{element}=".to_sym
         self.send(mth, value) if self.respond_to? mth
@@ -100,6 +113,7 @@ module BarFeeder
       @adapter.gather do 
         @load_material_di.value = 'NOT_READY'
         @change_material_di.value = 'NOT_READY'
+        @top_cut_di.value = 'NOT_READY'
         add_conditions
       end
     end
@@ -111,6 +125,7 @@ module BarFeeder
         @adapter.gather do 
           @load_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
           @change_material_di.value = 'READY'
+          @top_cut_di.value = 'READY'
           add_conditions
         end
       end
@@ -231,6 +246,21 @@ module BarFeeder
     def close_chuck
       @chuck_open = false
     end
+    
+    def top_cut
+      @adapter.gather do 
+        @change_material_di.value = 'READY'
+        @top_cut_di.value = 'ACTIVE'
+        add_conditions
+      end
+    end
+    
+    def top_cut_completed
+      @adapter.gather do 
+        @top_cut_di.value = 'READY'
+        add_conditions
+      end
+    end
   end
 
   @bar_feeder = Statemachine.build do
@@ -239,6 +269,7 @@ module BarFeeder
     superstate :base do
       event :chuck_state_open, :chuck_open
       event :chuck_state_unlatched, :chuck_not_open
+      event :chuck_state_unavailable, :chuck_not_open
       event :chuck_state_closed, :chuck_not_open
   
       superstate :disabled do
@@ -250,6 +281,8 @@ module BarFeeder
         state :not_ready do
           on_entry :interfaces_not_ready
           default :not_ready
+          
+          event :reset_cnc, :activated
           
           event :link_state_enabled, :activated
           event :normal, :activated
@@ -377,6 +410,19 @@ module BarFeeder
         trans :load_material, :chuck_state_closed, :load_material_fail, :close_chuck
         trans :load_material, :chuck_state_unlatched, :load_material_fail, :close_chuck
         trans :ready, :bar_finished, :end_of_bar
+        trans :change_material_complete, :change_material_ready, :top_cut
+        
+        state :top_cut do
+          on_entry :top_cut
+          event :top_cut_complete, :ready
+          event :top_cut_fail, :top_cut_fail, :top_cut_completed
+        end
+        
+        state :top_cut_fail do
+          default :top_cut_fail
+          on_entry :top_cut_fail
+          event :top_cut_ready, :ready
+        end
         
         # handle some failure conditions
         event :disconnected, :disabled

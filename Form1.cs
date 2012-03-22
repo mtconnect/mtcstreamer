@@ -41,6 +41,13 @@ namespace Streamer
                 this.iIN24.Checked = element.Value == "ACTIVE";
                 this.endOfBar.Text = element.Value;
             }
+            else if (element.Name.LocalName == "TopCut")
+            {
+                this.mAnyBus.topCut = element.Value == "ACTIVE";
+                this.iTOPCUT.Checked = this.mAnyBus.topCut;
+                this.topCut.Text = element.Value;
+                UpdateOutput();
+            }
             else if (element.Name.LocalName == "SpindleInterlock")
             {
                 this.iSPOK.Checked = element.Value == "UNLATCHED";
@@ -68,15 +75,25 @@ namespace Streamer
             {
                 this.iMATADV.Checked = completed;
                 this.loadMaterial.Text = node.Value;
-                this.mAnyBus.ADVFail = failed;
-                this.loadFail.Checked = failed;
+                if (completed)
+                {
+                    this.mAnyBus.oMATADV = false;
+                    this.oMATADV.Checked = false;
+                }
+                //this.mAnyBus.ADVFail = failed;
+                //this.loadFail.Checked = failed;
             }
             else if (node.Name.LocalName == "ChangeMaterial")
             {
                 this.iMATCHG.Checked = completed;
                 this.changeMaterial.Text = node.Value;
-                this.mAnyBus.CHGFail = failed;
-                this.changeFail.Checked = failed;
+                if (completed)
+                {
+                    this.mAnyBus.oMATCHG = false;
+                    this.oMATCHG.Checked = false;
+                }
+                //this.mAnyBus.CHGFail = failed;
+                //this.changeFail.Checked = failed;
             }
             else
             {
@@ -96,7 +113,7 @@ namespace Streamer
             }
             else 
             {
-                this.condition.Text = cond.Value;
+                this.condition.Text = cond.Name.LocalName + " - " + cond.Value;
                 this.iBFANML_B.Checked = active;
             }
         }
@@ -178,6 +195,7 @@ namespace Streamer
                 this.changeMaterial.Text = "";
                 this.empty.Text = "";
                 this.condition.Text = "";
+                this.topCut.Text = "";
             }
         }
 
@@ -228,6 +246,7 @@ namespace Streamer
             oChangeMaterial.Text = mAnyBus.Change;
             oChuckState.Text = mAnyBus.Chuck;
             oSystem.Text = mAnyBus.System;
+            oTopCut.Text = mAnyBus.TopCut;
         }
 
         private void oBFCDM_CheckedChanged(object sender, EventArgs e)

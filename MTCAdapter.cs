@@ -113,6 +113,7 @@ namespace MTConnect
         {
             TcpClient tcpClient = (TcpClient)client;
             NetworkStream clientStream = tcpClient.GetStream();
+            clientStream.ReadTimeout = 2000;
             mClients.Add(clientStream);
 
             byte[] message = new byte[4096];
@@ -133,12 +134,14 @@ namespace MTConnect
                     catch
                     {
                         //a socket error has occured
+                        Console.WriteLine("Heartbeat read exception");
                         break;
                     }
 
                     if (bytesRead == 0)
                     {
                         //the client has disconnected from the server
+                        Console.WriteLine("No bytes were read from heartbeat thread");
                         break;
                     }
 
