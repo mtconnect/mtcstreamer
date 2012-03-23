@@ -90,6 +90,8 @@ namespace Streamer
 
         public void UpdateDevices()
         {
+            // Read Devices from AnyBus...
+
             // Get states from anybus...
             if (oBFCDM && oALMAB_B)
             {
@@ -247,6 +249,9 @@ namespace Streamer
                 foreach (XNode evt in eventList.Nodes())
                     HandleEvent(evt);
             }
+
+            // Write out bits to AnyBus
+            WriteToAnyBus();
         }
 
         public void BFConnectionError(string why)
@@ -275,6 +280,25 @@ namespace Streamer
             this.BFEmpty = "";
             this.BFSystem = "";
             this.BFTopCut = "";
+
+            WriteToAnyBus();
+        }
+
+        private UInt32 SetBit(int aIndex, bool aValue)
+        {
+            UInt32 val = aValue ? (UInt32)1 : (UInt32)0;
+            return (UInt32)(val << aIndex);
+        }
+
+        private void WriteToAnyBus()
+        {
+            // Bit order
+            // 0 - iIN23, 1 - iIN24, 2 - iBFANML_B, 3 - iMATCHG, 4 - iMATADV
+            // 5 - iCUC_B, 6 - iSPOK, 7 - iNMCY, 8 - iNMCY_B, 9 - iMATRET
+            UInt32 reg = SetBit(1, iIN24) | SetBit(2, iBFANML_B) |
+                SetBit(3, iMATCHG) | SetBit(4, iMATADV) | SetBit(6, iSPOK) |
+                SetBit(8, iNMCY_B);
+            Console.WriteLine("Input register value: " + Convert.ToString((UInt16) reg, 16));
         }
     }
 }
