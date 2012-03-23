@@ -69,7 +69,7 @@ module BarFeeder
     end
   
     def activate
-      if @link_state == "ENABLED" and @faults.empty? 
+      if @link_state == "ENABLED" and @faults.empty? and @chuck_open
         puts "Becomming operational"
         @statemachine.make_operational
       else
@@ -219,7 +219,6 @@ module BarFeeder
     end
     
     def load_material_failed
-      @failed = true
       @adapter.gather do 
         @load_material_di.value = 'FAIL'
         add_conditions
@@ -232,24 +231,22 @@ module BarFeeder
         add_conditions
       end
     end
+    
+    def reset_history
+      @statemachine.get_state(:operational).reset
+    end
   
     def faulted
     end
   
     def chuck_open
       @chuck_open = true
-      @statemachine.activate
     end
   
     def chuck_not_open
       @chuck_open = false
-      @statemachine.activate
     end
-    
-    def close_chuck
-      @chuck_open = false
-    end
-    
+        
     def top_cut
       @adapter.gather do 
         @change_material_di.value = 'READY'
@@ -271,10 +268,10 @@ module BarFeeder
     startstate :disabled
   
     superstate :base do
-      event :chuck_state_open, :chuck_open
-      event :chuck_state_unlatched, :chuck_not_open
-      event :chuck_state_unavailable, :chuck_not_open
-      event :chuck_state_closed, :chuck_not_open
+      event :chuck_state_open, :activated, :chuck_open
+      event :chuck_state_unlatched, :activated, :chuck_not_open
+      event :chuck_state_unavailable, :activated, :chuck_not_open
+      event :chuck_state_closed, :activated, :chuck_not_open
   
       superstate :disabled do
         default :not_ready
@@ -316,17 +313,7 @@ module BarFeeder
         event :make_operational, :operational_H
         event :still_not_ready, :not_ready
       end
-  
-      state :chuck_open do
-        on_entry :chuck_open
-        event :activate, :activated
-      end
-  
-      state :chuck_not_open do
-        on_entry :chuck_not_open
-        event :activate, :activated
-      end
-  
+    
       state :load_fail do
         default :load_fail
         on_entry :load_material_failed
@@ -365,8 +352,11 @@ module BarFeeder
             event ready, fail
             event completed, complete
             event fail, cnc_fail
-            event :chuck_state_closed, fail, :close_chuck
-            event :chuck_state_unlatched, fail, :close_chuck
+            
+            # Handle the chuck state failures
+            event :chuck_state_unlatched, fail, :chuck_not_open
+            event :chuck_state_unavailable, fail, :chuck_not_open
+            event :chuck_state_closed, fail, :chuck_not_open
           end
     
           # Handle invalid CNC state change in which we will respond with a fail
@@ -375,7 +365,7 @@ module BarFeeder
           state fail do
             on_entry failed
             default fail
-            event fail, :ready
+            event fail, :activated, :reset_history
           end
     
           # Handle CNC failing current operation. We should
@@ -433,7 +423,7 @@ module BarFeeder
         event :fault, :fault, :faulted
         event :link_state_unavailable, :disabled
         event :link_state_disabled, :disabled
-        event :availability_unavailable, :disabled            
+        event :availability_unavailable, :disabled 
       end
     end
   
