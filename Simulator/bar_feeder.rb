@@ -45,7 +45,6 @@ module BarFeeder
       @fill_di.normal
       @system_di.normal
       @mag_empty = false
-      @failed = false
       @connected = false
       @top_cut_di.value = 'READY'
         
@@ -124,7 +123,7 @@ module BarFeeder
       else          
         @adapter.gather do 
           @load_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
-          @change_material_di.value = 'READY'
+          @change_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
           @top_cut_di.value = 'READY'
           add_conditions
         end
@@ -135,7 +134,6 @@ module BarFeeder
       unless @chuck_open
         @statemachine.chuck_state_closed
       else
-        @failed = false
         @adapter.gather do 
           @spindle_interlock_di.value = 'LATCHED'
           @load_material_di.value = 'ACTIVE'
@@ -149,13 +147,17 @@ module BarFeeder
     end
   
     def begin_change_material
-      @adapter.gather do 
-        @change_material_di.value = 'ACTIVE'
-        add_conditions
-      end
-      Thread.new do
-        sleep 2
-        @statemachine.change_material_completed
+      unless @chuck_open
+        @statemachine.chuck_state_closed
+      else
+        @adapter.gather do 
+          @change_material_di.value = 'ACTIVE'
+          add_conditions
+        end
+        Thread.new do
+          sleep 2
+          @statemachine.change_material_completed
+        end
       end
     end
       
@@ -170,7 +172,7 @@ module BarFeeder
       else      
         @adapter.gather do 
           @load_material_di.value = 'NOT_READY'
-          @change_material_di.value = 'READY'
+          @change_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
           @end_of_bar_di.value = 'ACTIVE'
           add_conditions
         end
@@ -178,7 +180,6 @@ module BarFeeder
     end
 
     def load_material_completed
-      @statemachine.load_material_failed if @failed
       @remaining_length -= @part_length
       puts "**** Remaining length: #{@remaining_length}"
       @adapter.gather do 
@@ -190,16 +191,16 @@ module BarFeeder
     end
   
     def change_material_completed
+      if @remaining_material > 0
+        @remaining_material -= 1
+        puts "**** Remaining bars: #{@remaining_material}"
+        @remain_di.value = @remaining_material
+        @remaining_length = 100.0
+      end
       @adapter.gather do 
         @change_material_di.value = 'COMPLETE'
         @end_of_bar_di.value = 'READY'
-        if @remaining_material > 0
-          @remaining_material -= 1
-          puts "**** Remaining bars: #{@remaining_material}"
-          @remain_di.value = @remaining_material
-          @remaining_length = 100.0
-          @length_di.value =  @remaining_length          
-        end
+        @length_di.value =  @remaining_length          
         add_conditions
       end
     end
@@ -250,6 +251,7 @@ module BarFeeder
     def top_cut
       @adapter.gather do 
         @change_material_di.value = 'READY'
+        @load_material_di.value = 'READY'
         @top_cut_di.value = 'ACTIVE'
         add_conditions
       end
@@ -360,7 +362,9 @@ module BarFeeder
             on_entry "begin_#{interface}".to_sym
             event ready, fail
             event completed, complete
-            event fail, cnc_fail          
+            event fail, cnc_fail
+            event :chuck_state_closed, fail, :close_chuck
+            event :chuck_state_unlatched, fail, :close_chuck
           end
     
           # Handle invalid CNC state change in which we will respond with a fail
@@ -407,8 +411,6 @@ module BarFeeder
         end
         
         # A few other states
-        trans :load_material, :chuck_state_closed, :load_material_fail, :close_chuck
-        trans :load_material, :chuck_state_unlatched, :load_material_fail, :close_chuck
         trans :ready, :bar_finished, :end_of_bar
         trans :change_material_complete, :change_material_ready, :top_cut
         

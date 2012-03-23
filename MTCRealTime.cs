@@ -141,7 +141,8 @@ namespace MTConnect
         // use separate HTTP connection group or use default
         private bool useSeparateConnectionGroup = true;
         // timeout value for web request
-        private int requestTimeout = 10000;
+        private int requestTimeout = 2000;
+        private int heartbeatTimeout = 2000;
         // user data associated with the source
         private object userData = null;
 
@@ -256,6 +257,12 @@ namespace MTConnect
         {
             get { return requestTimeout; }
             set { requestTimeout = value; }
+        }
+
+        public int HeartbeatTimeout
+        {
+            get { return heartbeatTimeout; }
+            set { heartbeatTimeout = value; }
         }
 
         /// <summary>
@@ -494,7 +501,7 @@ namespace MTConnect
 
                     // get response stream
                     stream = response.GetResponseStream();
-                    stream.ReadTimeout = 2000;
+                    stream.ReadTimeout = heartbeatTimeout;
 
                     // loop
                     while ((!stopEvent.WaitOne(0, true)) && (!reloadEvent.WaitOne(0, true)))

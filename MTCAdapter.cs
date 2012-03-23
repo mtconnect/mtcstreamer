@@ -53,6 +53,9 @@ namespace MTConnect
         private bool mRunning = false;
         private TcpListener mListener;
         byte[] PONG;
+        private ArrayList mDataItems = new ArrayList();
+        int mHeartbeat = 1000;
+        public int Heartbeat { get { return mHeartbeat; } set { mHeartbeat = value; } }
 
         private int mPort;
         public int Port
@@ -66,32 +69,61 @@ namespace MTConnect
         {
             mPort = aPort;
             ASCIIEncoding encoder = new ASCIIEncoding();
-            PONG = encoder.GetBytes("* PONG 1000\n");
+            PONG = encoder.GetBytes("* PONG " + mHeartbeat.ToString() + "\n");
+        }
+
+        public void AddDataItem(MTCDataItem aDI)
+        {
+            mDataItems.Add(aDI);
+        }
+
+        public void Send()
+        {
+            foreach (Object di in mDataItems)
+            {
+                Send((MTCDataItem) di);
+            }
+        }
+
+        public byte[] FormatDataItem(MTCDataItem aDi)
+        {
+            DateTime now = DateTime.UtcNow;
+            String timestamp = now.ToString("yyyy-MM-dd\\THH:mm:ss.fffffffK|");
+            ASCIIEncoding encoder = new ASCIIEncoding();
+            String line = timestamp + aDi + "\n";
+            byte[] message = encoder.GetBytes(line.ToCharArray());
+            Console.WriteLine("Sending: " + line);
+
+            return message;
         }
 
         public void Send(MTCDataItem aDI)
         {
             if (aDI.Changed)
             {
-                Send(aDI.ToString());
+                byte[] message = FormatDataItem(aDI);
+                foreach (object obj in mClients)
+                {
+                    NetworkStream client = (NetworkStream)obj;
+                    lock (client)
+                    {
+                        client.Write(message, 0, message.Length);
+                        client.Flush();
+                    }
+                }
                 aDI.ResetChanged();
             }
         }
 
-        public void Send(String aText)
+        public void SendAllTo(NetworkStream aClient)
         {
-            DateTime now = DateTime.UtcNow;
-            String timestamp = now.ToString("yyyy-MM-dd\\THH:mm:ss.fffffffK|");
-            ASCIIEncoding encoder = new ASCIIEncoding();
-            String line = timestamp + aText + "\n";
-            byte[] message = encoder.GetBytes(line.ToCharArray());
-            Console.WriteLine("Sending: " + line);
-            foreach (object obj in mClients) {
-                NetworkStream client = (NetworkStream) obj;
-                lock (client)
+            lock (aClient)
+            {
+                foreach (object di in mDataItems)
                 {
-                    client.Write(message, 0, message.Length);
-                    client.Flush();
+                    byte[] message = FormatDataItem((MTCDataItem) di);
+                    aClient.Write(message, 0, message.Length);
+                    aClient.Flush();
                 }
             }
         }
@@ -113,7 +145,7 @@ namespace MTConnect
         {
             TcpClient tcpClient = (TcpClient)client;
             NetworkStream clientStream = tcpClient.GetStream();
-            clientStream.ReadTimeout = 2000;
+            clientStream.ReadTimeout = mHeartbeat * 2;
             mClients.Add(clientStream);
 
             byte[] message = new byte[4096];
@@ -195,6 +227,8 @@ namespace MTConnect
                     //with connected client
                     Thread clientThread = new Thread(new ParameterizedThreadStart(HeartbeatClient));
                     clientThread.Start(client);
+
+                    SendAllTo(client.GetStream());
                 }
             }
             catch (Exception)

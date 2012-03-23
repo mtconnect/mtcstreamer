@@ -13,6 +13,9 @@ namespace Streamer
     using System.Windows.Forms;
     using System.Collections;
     using MTConnect;
+    using System.Xml.Linq;
+    using System.Net;
+    using System.IO;
 
     public class AnyBusMonitor
     {
@@ -27,7 +30,17 @@ namespace Streamer
         public bool oBFCHCL { get; set; }
         public bool ADVFail { get; set; }
         public bool CHGFail { get; set; }
-        public bool topCut { get; set; }
+
+        // Input registers from the Bar Feeder
+        public bool iNMCY_B { get; set; }
+        public bool iMATADV { get; set; }
+        public bool iMATCHG { get; set; }
+        public bool iIN24 { get; set; }
+        public bool iSPOK { get; set; }
+        public bool iBFANML_B { get; set; }
+        public bool iTOPCUT { get; set; }
+        public bool LoadFail { get; set; }
+        public bool ChangeFail { get; set; }
 
         // Define the data items we're mirroring with these 
         // output variables
@@ -39,6 +52,17 @@ namespace Streamer
         private MTCDataItem mAvail = new MTCDataItem("avail");
         private MTCDataItem mTopCut = new MTCDataItem("top_cut");
 
+        // MTConnect Data Item Values
+        public string BFTopCut { get; set; }
+        public string BFLoadMaterial { get; set; }
+        public string BFChangeMaterial { get; set; }
+        public string BFEndOfBar { get; set; }
+        public string BFSpindleInterlock { get; set; }
+        public string BFStock { get; set; }
+        public string BFLength { get; set; }
+        public string BFEmpty { get; set; }
+        public string BFSystem { get; set; }
+
         public string Load { get { return mLoad.Value; } }
         public string TopCut { get { return mTopCut.Value; } }
         public string Change { get { return mChange.Value; } }
@@ -49,9 +73,19 @@ namespace Streamer
         public AnyBusMonitor(MTCAdapter adapter)
         {
             mAdapter = adapter;
-            ADVFail = CHGFail = topCut = false;
+            mAdapter.AddDataItem(mTopCut);
+            mAdapter.AddDataItem(mLoad);
+            mAdapter.AddDataItem(mChange);
+            mAdapter.AddDataItem(mChuck);
+            mAdapter.AddDataItem(mSystem);
+            mAdapter.AddDataItem(mLinkMode);
+            mAdapter.AddDataItem(mAvail);
+
             mAvail.Value = "AVAILABLE";
-            mTopCut.Value = "READY";
+
+            BFConnectionError("Starting...");
+
+            UpdateDevices();
         }
 
         public void UpdateDevices()
@@ -65,9 +99,9 @@ namespace Streamer
                     mChange.Value = "FAIL";
                 else
                 {
-                    if (topCut && oMATADV)
+                    if (iTOPCUT && oMATADV)
                         mTopCut.Value = "COMPLETE";
-                    else if (topCut)
+                    else if (iTOPCUT)
                         mTopCut.Value = "ACTIVE";
                     else
                         mTopCut.Value = "READY";
@@ -80,7 +114,6 @@ namespace Streamer
             {
                 mLoad.Value = "NOT_READY";
                 mChange.Value = "NOT_READY";
-                mLinkMode.Value = "DISABLED";
             }
 
 
@@ -96,13 +129,152 @@ namespace Streamer
             mLinkMode.Value = oBFCDM ? "ENABLED" : "DISABLED";
 
             // Send changed data...
-            mAdapter.Send(mTopCut);
-            mAdapter.Send(mLoad);
-            mAdapter.Send(mChange);
-            mAdapter.Send(mChuck);
-            mAdapter.Send(mSystem);
-            mAdapter.Send(mLinkMode);
-            mAdapter.Send(mAvail);
+            mAdapter.Send();
+        }
+
+        private void HandleEvent(XNode node)
+        {
+            if (node.GetType() != typeof(XElement))
+                return;
+
+            XElement element = (XElement) node;
+
+            // Check each event, for the two interfaces, we'll handle
+            // only the complete state, since that is what we're limited 
+            // to...
+            if (element.Name.LocalName == "LoadMaterial" || element.Name.LocalName == "ChangeMaterial")
+            {
+                HandleInterface(element);
+            }
+            else if (element.Name.LocalName == "EndOfBar")
+            {
+                this.iIN24 = element.Value == "ACTIVE";
+                this.BFEndOfBar = element.Value;
+            }
+            else if (element.Name.LocalName == "TopCut")
+            {
+                this.iTOPCUT = element.Value == "ACTIVE";;
+                this.BFTopCut = element.Value;
+            }
+            else if (element.Name.LocalName == "SpindleInterlock")
+            {
+                this.iSPOK = element.Value == "UNLATCHED";
+                this.BFSpindleInterlock = element.Value;
+            }
+            else if (element.Name.LocalName == "RemainingMaterial")
+            {
+                this.BFStock = element.Value;
+            }
+            else if (element.Name.LocalName == "BarLength")
+            {
+                this.BFLength = element.Value;
+            }
+            else
+            {
+                Console.WriteLine("Unknown node: " + element.Name);
+            }
+        }
+
+        private void HandleInterface(XElement node)
+        {
+            bool completed = node.Value == "COMPLETE";
+            bool failed = node.Value == "FAIL";
+            if (node.Name.LocalName == "LoadMaterial")
+            {
+                this.iMATADV = completed;
+                this.BFLoadMaterial = node.Value;
+                this.LoadFail = failed;
+                if (completed)
+                {
+                    this.oMATADV = false;
+                }
+            }
+            else if (node.Name.LocalName == "ChangeMaterial")
+            {
+                this.iMATCHG = completed;
+                this.BFChangeMaterial = node.Value;
+                this.ChangeFail = failed;
+                if (completed)
+                {
+                    this.oMATCHG = false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Unknown node: " + node.Name);
+            }
+        }
+
+        private void HandleCondition(XElement cond)
+        {
+            bool active = cond.Name.LocalName != "Fault" &&
+                    cond.Name.LocalName != "Unavailable";
+            if (cond.Attribute("type").Value == "FILL_LEVEL")
+            {
+                this.BFEmpty = cond.Name.LocalName + " - " + cond.Value;
+                this.iNMCY_B = active;
+            }
+            else 
+            {
+                this.BFSystem = cond.Name.LocalName + " - " + cond.Value;
+                this.iBFANML_B = active;
+            }
+        }
+
+        public void ParseXML(string text)
+        {
+            // Check for changes to the BarFeeder interface data items
+            // and update the bits in AnyBus
+            XElement barfeed = XElement.Parse(text);
+            XNamespace ns = barfeed.Name.Namespace;
+
+            // First check for any Faults...
+            IEnumerable<XElement> conditionLists =
+                from node in barfeed.Descendants(ns + "Condition")
+                select node;
+            foreach (XElement conditionList in conditionLists)
+            {
+                foreach (XNode cond in conditionList.Nodes())
+                    HandleCondition((XElement) cond);
+            }
+
+            // Now we handle the remaining states...
+            IEnumerable<XElement> eventLists =
+                from node in barfeed.Descendants(ns + "Events")
+                select node;
+            foreach (XElement eventList in eventLists)
+            {
+                foreach (XNode evt in eventList.Nodes())
+                    HandleEvent(evt);
+            }
+        }
+
+        public void BFConnectionError(string why)
+        {
+            Console.WriteLine("MTConnect stream just not connected: " + why);
+
+            // Stream is now disconnected... set all DIO signals 
+            // to low. Will automatically update on reconnect.
+
+            this.iBFANML_B = false;
+            this.iNMCY_B = false;
+            this.iMATADV = false;
+            this.iMATCHG = false;
+            this.iIN24 = false;
+            this.iSPOK = false;
+            this.iTOPCUT = false;
+            this.LoadFail = false;
+            this.ChangeFail = false;
+
+            this.BFEndOfBar = "";
+            this.BFLoadMaterial = "";
+            this.BFSpindleInterlock = "";
+            this.BFStock = "";
+            this.BFLength = "";
+            this.BFChangeMaterial = "";
+            this.BFEmpty = "";
+            this.BFSystem = "";
+            this.BFTopCut = "";
         }
     }
 }

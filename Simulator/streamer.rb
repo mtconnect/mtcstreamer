@@ -19,12 +19,15 @@ module MTConnect
         instance = x.attributes['instanceId'].to_i
       }
       
+      events = []
       document.each_element('//Events/*') do |e|
-        block.call(e.name, e.text.to_s)
+        events << [e.attributes['sequence'].to_i, [e.name, e.text.to_s]]
       end
       document.each_element('//Condition/*') do |e|
-        block.call(e.name, "#{e.attributes['type']}_#{e.attributes['nativeCode']}")
+        events << [e.attributes['sequence'].to_i, [e.name, "#{e.attributes['type']}_#{e.attributes['nativeCode']}"]]
       end
+      events.sort.each { |e| block.call(*e[1]) }
+      
       [nxt, instance] 
     end
 
