@@ -14,13 +14,7 @@ module BarFeeder
   
     include MTConnect
   
-    def initialize
-      @faults = {}
-      @remaining_material = 5
-      @remaining_length = 0.0
-      @part_length = 24.2
-      @chuck_open = false
-    
+    def initialize    
       @adapter = Adapter.new
       @adapter.data_items << (@availability_di = DataItem.new('avail'))
       @adapter.data_items << (@mode_di = DataItem.new('mode'))
@@ -34,7 +28,8 @@ module BarFeeder
       @adapter.data_items << (@system_di = Condition.new('system'))
       @adapter.data_items << (@fill_di = Condition.new('fill'))
       @adapter.data_items << (@top_cut_di = DataItem.new('top_cut'))
-    
+
+      # Initialize data items
       @availability_di.value = "AVAILABLE"
       @exec_di.value = 'READY'
       @mode_di.value = 'AUTOMATIC'
@@ -42,12 +37,19 @@ module BarFeeder
       @spindle_interlock_di.value = 'UNLATCHED'
       @remain_di.value = @remaining_material
       @length_di.value = @remaining_length
+      @top_cut_di.value = 'READY'
       @fill_di.normal
       @system_di.normal
+      
+      # Initialize bar feeder state...
       @mag_empty = false
       @connected = false
-      @top_cut_di.value = 'READY'
-        
+      @faults = {}
+      @remaining_material = 5
+      @remaining_length = 0.0
+      @part_length = 24.2
+      @chuck_open = false
+      
       @adapter.start    
     end
   
