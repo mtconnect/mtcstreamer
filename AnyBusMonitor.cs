@@ -114,6 +114,7 @@ namespace Streamer
             {
                 mLoad.Value = "NOT_READY";
                 mChange.Value = "NOT_READY";
+                mTopCut.Value = "NOT_READY";
             }
 
 
@@ -125,7 +126,6 @@ namespace Streamer
                 mChuck.Value = "UNLATCHED";
 
             mSystem.Value = oALMAB_B ? "normal||||" : "fault||||Alarm A or B";
-            mAvail.Value = "AVAILABLE";
             mLinkMode.Value = oBFCDM ? "ENABLED" : "DISABLED";
 
             // Send changed data...
