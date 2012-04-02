@@ -1,12 +1,12 @@
 $: << '.'
 
-require 'bar_feeder'
+require 'cnc'
 
 
-BarFeeder.bar_feeder.tracer = STDOUT
-context = BarFeeder.bar_feeder.context
+Cnc.cnc.tracer = STDOUT
+context = Cnc.cnc.context
 
-streamer = MTConnect::Streamer.new('http://localhost:5000/cnc')
+streamer = MTConnect::Streamer.new('http://localhost:5000/BarFeeder')
 thread = streamer.start do |name, value|
   begin
     context.event(name, value)
@@ -29,10 +29,10 @@ while true
     
     # send the line as an event...
     event = line.strip.to_sym
-    if BarFeeder.bar_feeder.respond_to? event
-      BarFeeder.bar_feeder.send(event)
+    if Cnc.cnc.respond_to? event
+      Cnc.cnc.send(event)
     else
-      puts "Bar feeder does does not recognize #{event} in state #{BarFeeder.bar_feeder.state}"
+      puts "CNC does does not recognize #{event} in state #{Cnc.cnc.state}"
     end
   rescue
     puts "Error: #{$!}"

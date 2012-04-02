@@ -67,9 +67,15 @@ module MTConnect
           puts "Error occurred: #{$!}\n retrying..."
           puts $!.backtrace.join("\n")
           sleep 1
+        rescue Exception
+          puts "***** Exception: #{$!}"  
+          exit 1        
         end while @running
       end
     end
     @reader = nil
+    
+  rescue Exception
+    puts "***** Exception: #{$!}"    
   end
 end

@@ -6,16 +6,17 @@ require 'streamer'
 require 'statemachine'
 require 'readline'
 require 'statemachine/generate/dot_graph'
+require 'mtc_context'
 
 module BarFeeder
-  class BarFeederContext
-    attr_accessor :statemachine, :link_state, :load_material, :change_material, :chuck_state,
-      :fault
+  class BarFeederContext < MTConnect::Context
+    attr_accessor :link_state, :load_material, :change_material, :chuck_state, :fault
   
     include MTConnect
   
-    def initialize    
-      @adapter = Adapter.new
+    def initialize(port = 7878)
+      super(port)
+      
       @adapter.data_items << (@availability_di = DataItem.new('avail'))
       @adapter.data_items << (@mode_di = DataItem.new('mode'))
       @adapter.data_items << (@exec_di = DataItem.new('exec'))
@@ -32,7 +33,7 @@ module BarFeeder
       # Initialize data items
       @availability_di.value = "AVAILABLE"
       @exec_di.value = 'READY'
-      @mode_di.value = 'AUTOMATIC'
+      @mode_di.value = 'MANUAL'
       @end_of_bar_di.value = 'READY'
       @spindle_interlock_di.value = 'UNLATCHED'
       @remain_di.value = @remaining_material
@@ -43,18 +44,12 @@ module BarFeeder
       
       # Initialize bar feeder state...
       @mag_empty = false
-      @connected = false
-      @faults = {}
       @remaining_material = 5
       @remaining_length = 0.0
       @part_length = 24.2
       @chuck_open = false
-      
+            
       @adapter.start    
-    end
-  
-    def stop
-      @adapter.stop
     end
   
     def add_conditions
@@ -69,7 +64,9 @@ module BarFeeder
     end
   
     def activate
-      if @link_state == "ENABLED" and @faults.empty? and @chuck_open
+      if @mag_empty
+        @statemachine.empty
+      elsif @link_state == "ENABLED" and @faults.empty? and @chuck_open
         puts "Becomming operational"
         @statemachine.make_operational
       else
@@ -78,55 +75,29 @@ module BarFeeder
       end
     end
   
-    def event(name, value)
-      puts "Received #{name} #{value}"
-      case name 
-      when "Fault"
-        @faults[value] = true
-        @statemachine.fault
-        @connected = true
-      
-      when 'Warning', 'Normal'
-        @faults.delete(value)
-        @statemachine.normal if @faults.empty?
-        @connected = true
-            
-      when 'DISCONNECTED'
-        @statemachine.disconnected
-        @connected = false
-        @adapter.gather do 
-          add_conditions
-        end
-      
-      else
-        @connected = true
-        element = name.split(/([A-Z][a-z]+)/).delete_if(&:empty?).map(&:downcase).join('_')
-        mth = "#{element}=".to_sym
-        self.send(mth, value) if self.respond_to? mth
-      
-        # Only send valid events tot the statemachine. 
-        action = "#{element}_#{value.downcase}".to_sym
-        @statemachine.send(action) if @statemachine.respond_to? action
-      end
-    end
-  
     def interfaces_not_ready
       @adapter.gather do 
         @load_material_di.value = 'NOT_READY'
         @change_material_di.value = 'NOT_READY'
         @top_cut_di.value = 'NOT_READY'
+        @mode_di.value = 'MANUAL'
         add_conditions
       end
     end
 
     def interfaces_ready
       if @remaining_length < @part_length
+        @mode_di.value = 'AUTOMATIC'
+        @adapter.gather do 
+          @load_material_di.value = 'NOT_READY'
+        end
         @statemachine.bar_finished
       else          
         @adapter.gather do 
-          @load_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
-          @change_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
+          @load_material_di.value = 'READY'
+          @change_material_di.value = 'READY'
           @top_cut_di.value = 'READY'
+          @mode_di.value = 'AUTOMATIC'
           add_conditions
         end
       end
@@ -426,10 +397,10 @@ module BarFeeder
         event :availability_unavailable, :disabled 
       end
     end
-  
-    context BarFeederContext.new
+    
+    context BarFeederContext.new    
   end
-  
+    
   def self.bar_feeder
     @bar_feeder
   end

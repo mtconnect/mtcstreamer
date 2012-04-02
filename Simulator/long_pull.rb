@@ -38,7 +38,7 @@ class LongPull
       }
       
       begin
-        res.read_body do |chunk|        
+        res.read_body do |chunk|                  
           next if chunk.empty?
           document << chunk
 
