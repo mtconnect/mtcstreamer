@@ -126,6 +126,9 @@ namespace Streamer
             barLength.Text = mAnyBus.BFLength;
             stock.Text = mAnyBus.BFStock;
             topCut.Text = mAnyBus.BFTopCut;
+
+            iRegister.Text = "0x" + Convert.ToString(mAnyBus.iRegsiter, 16);
+            oRegister.Text = "0x" + Convert.ToString(mAnyBus.oRegsiter, 16);
         }
 
         private void oBFCDM_CheckedChanged(object sender, EventArgs e)

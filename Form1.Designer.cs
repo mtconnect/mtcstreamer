@@ -86,6 +86,10 @@
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
             this.topCutComplete = new System.Windows.Forms.CheckBox();
+            this.iRegister = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.oRegister = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -180,6 +184,10 @@
             // 
             // stopOperation
             // 
+            this.stopOperation.Controls.Add(this.label21);
+            this.stopOperation.Controls.Add(this.oRegister);
+            this.stopOperation.Controls.Add(this.label20);
+            this.stopOperation.Controls.Add(this.iRegister);
             this.stopOperation.Controls.Add(this.topCutComplete);
             this.stopOperation.Controls.Add(this.oTopCut);
             this.stopOperation.Controls.Add(this.label19);
@@ -675,6 +683,40 @@
             this.topCutComplete.UseVisualStyleBackColor = true;
             this.topCutComplete.CheckedChanged += new System.EventHandler(this.topCutComplete_CheckedChanged);
             // 
+            // iRegister
+            // 
+            this.iRegister.Location = new System.Drawing.Point(317, 179);
+            this.iRegister.Name = "iRegister";
+            this.iRegister.ReadOnly = true;
+            this.iRegister.Size = new System.Drawing.Size(226, 20);
+            this.iRegister.TabIndex = 31;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(212, 179);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(48, 13);
+            this.label20.TabIndex = 32;
+            this.label20.Text = "iRegister";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(212, 205);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(52, 13);
+            this.label21.TabIndex = 34;
+            this.label21.Text = "oRegister";
+            // 
+            // oRegister
+            // 
+            this.oRegister.Location = new System.Drawing.Point(317, 205);
+            this.oRegister.Name = "oRegister";
+            this.oRegister.ReadOnly = true;
+            this.oRegister.Size = new System.Drawing.Size(226, 20);
+            this.oRegister.TabIndex = 33;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -757,6 +799,10 @@
         private System.Windows.Forms.TextBox oTopCut;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.CheckBox topCutComplete;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox iRegister;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox oRegister;
     }
 }
 

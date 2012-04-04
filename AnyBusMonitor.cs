@@ -42,6 +42,8 @@ namespace Streamer
         public bool LoadFail { get; set; }
         public bool ChangeFail { get; set; }
         public bool TopCutComplete { get; set; }
+        public UInt16 iRegsiter { get; set; }
+        public UInt16 oRegsiter { get; set; }
 
         // Define the data items we're mirroring with these 
         // output variables
@@ -130,6 +132,8 @@ namespace Streamer
 
             mSystem.Value = oALMAB_B ? "normal||||" : "fault||||Alarm A or B";
             mLinkMode.Value = oBFCDM ? "ENABLED" : "DISABLED";
+
+            WriteToAnyBus();
 
             // Send changed data...
             mAdapter.Send();
@@ -303,7 +307,15 @@ namespace Streamer
             UInt32 reg = SetBit(1, iIN24) | SetBit(2, iBFANML_B) |
                 SetBit(3, iMATCHG) | SetBit(4, iMATADV) | SetBit(6, iSPOK) |
                 SetBit(8, iNMCY_B);
-            Console.WriteLine("Input register value: " + Convert.ToString((UInt16) reg, 16));
+            Console.WriteLine("Input register value: 0x" + Convert.ToString((UInt16) reg, 16));
+            iRegsiter = (UInt16) reg;
+
+
+            reg = SetBit(0, oBFCHCL) | SetBit(1, oBFCHOP) |
+                SetBit(2, oMATCHG) | SetBit(3, oMATADV) | SetBit(5, oBFCDM) |
+                SetBit(8, oALMAB_B);
+            Console.WriteLine("Output register value: 0x" + Convert.ToString((UInt16)reg, 16));
+            oRegsiter = (UInt16)reg;
         }
     }
 }
