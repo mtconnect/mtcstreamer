@@ -14,7 +14,7 @@ module Cnc
     attr_accessor :controller_mode
   
     def initialize(port = 7879)
-      @adapter = Adapter.new(port)
+      super(port)
       
       @adapter.data_items << (@availability_di = DataItem.new('avail'))
       @adapter.data_items << (@load_material_di = DataItem.new('load_mat'))
@@ -40,7 +40,6 @@ module Cnc
       @load_ready = false
       
       @system_di.normal
-      @faults = {}
       
       @adapter.start    
     end
@@ -179,6 +178,7 @@ module Cnc
     end
     
     def one_cycle
+      # Make sure spindle is not latched
       @adapter.gather do
         @load_material_di.value = 'READY'
       end
@@ -186,6 +186,10 @@ module Cnc
         sleep 1
         @statemachine.cycle_completed
       end
+    end
+    
+    def reset_history
+      @statemachine.get_state(:operational).reset
     end
   
     def add_conditions
@@ -200,11 +204,12 @@ module Cnc
       event :load_material_ready, :activated, :load_ready
       event :change_material_not_ready, :activated, :change_not_ready
       event :change_material_ready, :activated, :change_ready
-      event :fault, :fault
+      event :fault, :fault, :reset_history
       event :automatic, :activated, :automatic_mode
       event :maunal, :activated, :manual_mode
       event :disable, :activated, :disable
       event :enable, :activated, :enable
+      event :normal, :activated
       
       superstate :disabled do
         default :not_ready

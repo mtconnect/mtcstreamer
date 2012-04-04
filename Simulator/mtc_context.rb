@@ -51,7 +51,7 @@ module MTConnect
         @connected = true
     
       when 'Warning', 'Normal'
-        @faults.delete(value)
+        @faults.keys.each { |k| @faults.delete(k) if k =~ /^#{value}/ }
         @statemachine.normal if @faults.empty?
         @connected = true
           

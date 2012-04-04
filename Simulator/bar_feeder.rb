@@ -283,6 +283,7 @@ module BarFeeder
         on_entry :activate
         event :make_operational, :operational_H
         event :still_not_ready, :not_ready
+        event :empty, :empty
       end
     
       state :load_fail do
