@@ -1,0 +1,13 @@
+
+Ruby One Click Installer:
+  http://rubyinstaller.org/
+  
+  Select to download 1.9.3 or later version of ruby
+  
+  Click through installer, make sure you check to add ruby to your path.
+  
+Install statemachine gem
+  gem install statemachine
+  
+
+  
