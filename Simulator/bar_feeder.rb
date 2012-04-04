@@ -407,6 +407,10 @@ module BarFeeder
           on_entry :top_cut
           event :top_cut_complete, :ready, :top_cut_completed
           event :top_cut_fail, :top_cut_fail
+          
+          event :chuck_state_open, :top_cut, :chuck_open
+          event :chuck_state_unlatched, :top_cut, :chuck_not_open
+          event :chuck_state_closed, :top_cut, :chuck_not_open
         end
         
         state :top_cut_fail do
