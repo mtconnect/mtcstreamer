@@ -41,6 +41,7 @@ namespace Streamer
         public bool iTOPCUT { get; set; }
         public bool LoadFail { get; set; }
         public bool ChangeFail { get; set; }
+        public bool TopCutComplete { get; set; }
 
         // Define the data items we're mirroring with these 
         // output variables
@@ -101,7 +102,7 @@ namespace Streamer
                     mChange.Value = "FAIL";
                 else
                 {
-                    if (iTOPCUT && oMATADV)
+                    if (TopCutComplete)
                         mTopCut.Value = "COMPLETE";
                     else if (iTOPCUT)
                         mTopCut.Value = "ACTIVE";
@@ -150,7 +151,6 @@ namespace Streamer
             }
             else if (element.Name.LocalName == "EndOfBar")
             {
-                this.iIN24 = element.Value == "ACTIVE";
                 this.BFEndOfBar = element.Value;
             }
             else if (element.Name.LocalName == "TopCut")
@@ -174,6 +174,11 @@ namespace Streamer
             else
             {
                 Console.WriteLine("Unknown node: " + element.Name);
+            }
+
+            if (element.Name.LocalName == "EndOfBar" || element.Name.LocalName == "TopCut")
+            {
+                this.iIN24 = element.Value == "ACTIVE";
             }
         }
 

@@ -175,5 +175,11 @@ namespace Streamer
             this.mAnyBus.CHGFail = changeFail.Checked;
             UpdateOutput();
         }
+
+        private void topCutComplete_CheckedChanged(object sender, EventArgs e)
+        {
+            this.mAnyBus.TopCutComplete = topCutComplete.Checked;
+            UpdateOutput();
+        }
     }
 }

@@ -85,6 +85,7 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
+            this.topCutComplete = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -179,6 +180,7 @@
             // 
             // stopOperation
             // 
+            this.stopOperation.Controls.Add(this.topCutComplete);
             this.stopOperation.Controls.Add(this.oTopCut);
             this.stopOperation.Controls.Add(this.label19);
             this.stopOperation.Controls.Add(this.changeFail);
@@ -202,7 +204,7 @@
             this.stopOperation.Controls.Add(this.label10);
             this.stopOperation.Location = new System.Drawing.Point(12, 125);
             this.stopOperation.Name = "stopOperation";
-            this.stopOperation.Size = new System.Drawing.Size(563, 211);
+            this.stopOperation.Size = new System.Drawing.Size(563, 234);
             this.stopOperation.TabIndex = 17;
             this.stopOperation.TabStop = false;
             this.stopOperation.Text = "Update";
@@ -227,7 +229,7 @@
             // changeFail
             // 
             this.changeFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.changeFail.Location = new System.Drawing.Point(10, 183);
+            this.changeFail.Location = new System.Drawing.Point(10, 209);
             this.changeFail.Name = "changeFail";
             this.changeFail.Size = new System.Drawing.Size(175, 17);
             this.changeFail.TabIndex = 29;
@@ -238,7 +240,7 @@
             // loadFail
             // 
             this.loadFail.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.loadFail.Location = new System.Drawing.Point(10, 160);
+            this.loadFail.Location = new System.Drawing.Point(10, 186);
             this.loadFail.Name = "loadFail";
             this.loadFail.Size = new System.Drawing.Size(175, 17);
             this.loadFail.TabIndex = 28;
@@ -432,7 +434,7 @@
             this.groupBox3.Controls.Add(this.iMATCHG);
             this.groupBox3.Controls.Add(this.iBFANML_B);
             this.groupBox3.Controls.Add(this.iIN24);
-            this.groupBox3.Location = new System.Drawing.Point(12, 353);
+            this.groupBox3.Location = new System.Drawing.Point(12, 374);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(563, 243);
             this.groupBox3.TabIndex = 18;
@@ -662,11 +664,22 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
+            // topCutComplete
+            // 
+            this.topCutComplete.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.topCutComplete.Location = new System.Drawing.Point(10, 162);
+            this.topCutComplete.Name = "topCutComplete";
+            this.topCutComplete.Size = new System.Drawing.Size(175, 17);
+            this.topCutComplete.TabIndex = 30;
+            this.topCutComplete.Text = "Top Cut Complete";
+            this.topCutComplete.UseVisualStyleBackColor = true;
+            this.topCutComplete.CheckedChanged += new System.EventHandler(this.topCutComplete_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(593, 608);
+            this.ClientSize = new System.Drawing.Size(593, 629);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
@@ -743,6 +756,7 @@
         private System.Windows.Forms.CheckBox iTOPCUT;
         private System.Windows.Forms.TextBox oTopCut;
         private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.CheckBox topCutComplete;
     }
 }
 
