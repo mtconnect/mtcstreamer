@@ -13,31 +13,45 @@
           <DataItems>
         		<DataItem type="CONTROLLER_MODE" category="EVENT" id="mode" name="mode"/>
         		<DataItem type="EXECUTION" category="EVENT" id="exec" name="exec"/>
-        		<DataItem type="END_OF_BAR" category="EVENT" id="eob" name="eob" />
           </DataItems>
         </Controller>
         <Magazine name="mag" id="mag">
           <DataItems>
-            <DataItem type="FILL_LEVEL" category="CONDITION" id="fl" name="fill" />
-            <DataItem type="REMAINING_MATERIAL" category="EVENT" id="rm" name="remain" />
-            <DataItem type="BAR_LENGTH" category="EVENT" id="lth" name="length" />
+            <DataItem type="FILL_LEVEL" category="EVENT" id="fl" name="fill" />
+            <DataItem type="FILL_LEVEL" category="CONDITION" id="fl" name="fill_cond" />
           </DataItems>
         </Magazine>
+        <Stock name="stock" id="stock">
+          <DataItems>
+            <DataItem type="WORKPIECE_ID" category="EVENT" id="wpid" name="work_id" />
+            <DataItem type="PART_COUNT" subType="REMAINING" category="EVENT" id="rm" name="parts" />
+            <DataItem type="LENGTH" subType="REMAINING" category="EVENT" id="lth" name="length" />
+            <DataItem type="END_OF_BAR" category="EVENT" id="end" name="eob" />
+            <DataItem type="NEW_BAR" category="EVENT" id="new" name="newb" />
+          </DataItems>
+        </Stock>
         <Interfaces name="interfaces" id="if">
           <Components>
             <MaterialLoader name="material" id="ml">
               <DataItems>
                 <!-- Interfaces -->
-                <DataItem type="LOAD_MATERIAL" category="EVENT" id="lm" name="load" />
-                <DataItem type="CHANGE_MATERIAL" category="EVENT" id="cm" name="change" />
-                <DataItem type="TOP_CUT" category="EVENT" id="tc" name="top_cut" />
+                <DataItem type="MATERIAL_FEED" subType="RESPONSE" category="EVENT" id="lm" name="load" />
+                <DataItem type="MATERIAL_CHANGE" subType="RESPONSE" category="EVENT" id="cm" name="change" />
+                <DataItem type="MATERIAL_RETRACT" subType="RESPONSE" category="EVENT" id="rt" name="retract" />
+                <DataItem type="PART_CHANGE" subType="RESPONSE" category="EVENT" id="pc" name="part_change" />
                 
-                <!-- Events -->
+                <!-- Events - Interlocks -->
                 <DataItem type="SPINDLE_INTERLOCK" category="EVENT" id="si" name="s_inter" />
+                <DataItem type="MANUAL_CHUCK_UNCLAMP_INTERLOCK" category="EVENT" id="mcu" name="c_unclamp" />
               </DataItems>
             </MaterialLoader>
           </Components>
         </Interfaces>
+        <Door name="door" id="dr">
+  			  <DataItems>
+  				  <DataItem type="DOOR_STATE" category="EVENT" id="drs" name="door_state"/>
+  			  </DataItems>
+        </Door>
       </Components>
     </Device>
     <Device uuid="CNC-000" name="cnc" sampleRate="10.0" id="c">
@@ -67,15 +81,21 @@
             <MaterialLoader name="material" id="ml2">
               <DataItems>
                 <!-- Interfaces -->
-                <DataItem type="LOAD_MATERIAL" category="EVENT" id="lm2" name="load_mat" />
-                <DataItem type="CHANGE_MATERIAL" category="EVENT" id="cm2" name="change_mat" />
-                <DataItem type="TOP_CUT" category="EVENT" id="tc2" name="top_cut" />
+                <DataItem type="MATERIAL_FEED" subType="REQUEST" category="EVENT" id="rlm" name="feed" />
+                <DataItem type="MATERIAL_CHANGE" subType="REQUEST" category="EVENT" id="rcm" name="change" />
+                <DataItem type="MATERIAL_RETRACT" subType="REQUEST" category="EVENT" id="rmr" name="retract" />
+                <DataItem type="PART_CHANGE" subType="REQUEST" category="EVENT" id="rpc" name="part_change" />
                 
                 <DataItem type="LINK_STATE" category="EVENT" id="ls" name="bf_link" />
               </DataItems>
             </MaterialLoader>
           </Components>
         </Interfaces>
+        <Door name="door" id="dr">
+  			  <DataItems>
+  				  <DataItem type="DOOR_STATE" category="EVENT" id="cdrs" name="door_state"/>
+  			  </DataItems>
+        </Door>        
       </Components>
     </Device>
   </Devices>

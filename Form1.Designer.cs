@@ -38,7 +38,11 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.stopOperation = new System.Windows.Forms.GroupBox();
-            this.oTopCut = new System.Windows.Forms.TextBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.oRegister = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.iRegister = new System.Windows.Forms.TextBox();
+            this.mode = new System.Windows.Forms.TextBox();
             this.label19 = new System.Windows.Forms.Label();
             this.changeFail = new System.Windows.Forms.CheckBox();
             this.loadFail = new System.Windows.Forms.CheckBox();
@@ -60,11 +64,9 @@
             this.oBFCDM = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.topCut = new System.Windows.Forms.TextBox();
+            this.newBar = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.iTOPCUT = new System.Windows.Forms.CheckBox();
-            this.stock = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
             this.barLength = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.empty = new System.Windows.Forms.TextBox();
@@ -85,11 +87,11 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
-            this.topCutComplete = new System.Windows.Forms.CheckBox();
-            this.iRegister = new System.Windows.Forms.TextBox();
-            this.label20 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
-            this.oRegister = new System.Windows.Forms.TextBox();
+            this.controllerMode = new System.Windows.Forms.CheckBox();
+            this.doorOpen = new System.Windows.Forms.CheckBox();
+            this.doorClosed = new System.Windows.Forms.CheckBox();
+            this.door = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -184,12 +186,16 @@
             // 
             // stopOperation
             // 
+            this.stopOperation.Controls.Add(this.door);
+            this.stopOperation.Controls.Add(this.label17);
+            this.stopOperation.Controls.Add(this.doorClosed);
+            this.stopOperation.Controls.Add(this.doorOpen);
+            this.stopOperation.Controls.Add(this.controllerMode);
             this.stopOperation.Controls.Add(this.label21);
             this.stopOperation.Controls.Add(this.oRegister);
             this.stopOperation.Controls.Add(this.label20);
             this.stopOperation.Controls.Add(this.iRegister);
-            this.stopOperation.Controls.Add(this.topCutComplete);
-            this.stopOperation.Controls.Add(this.oTopCut);
+            this.stopOperation.Controls.Add(this.mode);
             this.stopOperation.Controls.Add(this.label19);
             this.stopOperation.Controls.Add(this.changeFail);
             this.stopOperation.Controls.Add(this.loadFail);
@@ -212,27 +218,61 @@
             this.stopOperation.Controls.Add(this.label10);
             this.stopOperation.Location = new System.Drawing.Point(12, 125);
             this.stopOperation.Name = "stopOperation";
-            this.stopOperation.Size = new System.Drawing.Size(563, 234);
+            this.stopOperation.Size = new System.Drawing.Size(563, 272);
             this.stopOperation.TabIndex = 17;
             this.stopOperation.TabStop = false;
-            this.stopOperation.Text = "Update";
+            this.stopOperation.Text = "Machine Tool";
             // 
-            // oTopCut
+            // label21
             // 
-            this.oTopCut.Location = new System.Drawing.Point(317, 153);
-            this.oTopCut.Name = "oTopCut";
-            this.oTopCut.ReadOnly = true;
-            this.oTopCut.Size = new System.Drawing.Size(226, 20);
-            this.oTopCut.TabIndex = 27;
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(212, 205);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(52, 13);
+            this.label21.TabIndex = 34;
+            this.label21.Text = "oRegister";
+            // 
+            // oRegister
+            // 
+            this.oRegister.Location = new System.Drawing.Point(317, 205);
+            this.oRegister.Name = "oRegister";
+            this.oRegister.ReadOnly = true;
+            this.oRegister.Size = new System.Drawing.Size(226, 20);
+            this.oRegister.TabIndex = 33;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(212, 179);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(48, 13);
+            this.label20.TabIndex = 32;
+            this.label20.Text = "iRegister";
+            // 
+            // iRegister
+            // 
+            this.iRegister.Location = new System.Drawing.Point(317, 179);
+            this.iRegister.Name = "iRegister";
+            this.iRegister.ReadOnly = true;
+            this.iRegister.Size = new System.Drawing.Size(226, 20);
+            this.iRegister.TabIndex = 31;
+            // 
+            // mode
+            // 
+            this.mode.Location = new System.Drawing.Point(317, 153);
+            this.mode.Name = "mode";
+            this.mode.ReadOnly = true;
+            this.mode.Size = new System.Drawing.Size(226, 20);
+            this.mode.TabIndex = 27;
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(212, 156);
+            this.label19.Location = new System.Drawing.Point(212, 155);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(42, 13);
+            this.label19.Size = new System.Drawing.Size(78, 13);
             this.label19.TabIndex = 26;
-            this.label19.Text = "TopCut";
+            this.label19.Text = "ControllerMode";
             // 
             // changeFail
             // 
@@ -322,7 +362,7 @@
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(81, 13);
             this.label12.TabIndex = 20;
-            this.label12.Text = "ChangeMaterial";
+            this.label12.Text = "MaterialChange";
             // 
             // oLoadMaterial
             // 
@@ -339,7 +379,7 @@
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(68, 13);
             this.label11.TabIndex = 18;
-            this.label11.Text = "LoadMaterial";
+            this.label11.Text = "MaterialFeed";
             // 
             // oBFCHCL
             // 
@@ -417,11 +457,9 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.topCut);
+            this.groupBox3.Controls.Add(this.newBar);
             this.groupBox3.Controls.Add(this.label18);
             this.groupBox3.Controls.Add(this.iTOPCUT);
-            this.groupBox3.Controls.Add(this.stock);
-            this.groupBox3.Controls.Add(this.label17);
             this.groupBox3.Controls.Add(this.barLength);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.empty);
@@ -442,60 +480,43 @@
             this.groupBox3.Controls.Add(this.iMATCHG);
             this.groupBox3.Controls.Add(this.iBFANML_B);
             this.groupBox3.Controls.Add(this.iIN24);
-            this.groupBox3.Location = new System.Drawing.Point(12, 374);
+            this.groupBox3.Location = new System.Drawing.Point(12, 403);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(563, 243);
+            this.groupBox3.Size = new System.Drawing.Size(563, 214);
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Bar Feeder Status";
             // 
-            // topCut
+            // newBar
             // 
-            this.topCut.Location = new System.Drawing.Point(317, 218);
-            this.topCut.Name = "topCut";
-            this.topCut.ReadOnly = true;
-            this.topCut.Size = new System.Drawing.Size(226, 20);
-            this.topCut.TabIndex = 29;
+            this.newBar.Location = new System.Drawing.Point(317, 189);
+            this.newBar.Name = "newBar";
+            this.newBar.ReadOnly = true;
+            this.newBar.Size = new System.Drawing.Size(226, 20);
+            this.newBar.TabIndex = 29;
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(212, 219);
+            this.label18.Location = new System.Drawing.Point(207, 190);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(45, 13);
             this.label18.TabIndex = 28;
-            this.label18.Text = "Top Cut";
+            this.label18.Text = "NewBar";
             // 
             // iTOPCUT
             // 
             this.iTOPCUT.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iTOPCUT.Location = new System.Drawing.Point(10, 163);
+            this.iTOPCUT.Location = new System.Drawing.Point(5, 157);
             this.iTOPCUT.Name = "iTOPCUT";
             this.iTOPCUT.Size = new System.Drawing.Size(175, 17);
             this.iTOPCUT.TabIndex = 27;
             this.iTOPCUT.Text = "iTOPCUT - Top Cut";
             this.iTOPCUT.UseVisualStyleBackColor = true;
             // 
-            // stock
-            // 
-            this.stock.Location = new System.Drawing.Point(317, 194);
-            this.stock.Name = "stock";
-            this.stock.ReadOnly = true;
-            this.stock.Size = new System.Drawing.Size(226, 20);
-            this.stock.TabIndex = 26;
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(212, 195);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(35, 13);
-            this.label17.TabIndex = 25;
-            this.label17.Text = "Stock";
-            // 
             // barLength
             // 
-            this.barLength.Location = new System.Drawing.Point(317, 168);
+            this.barLength.Location = new System.Drawing.Point(317, 165);
             this.barLength.Name = "barLength";
             this.barLength.ReadOnly = true;
             this.barLength.Size = new System.Drawing.Size(226, 20);
@@ -504,7 +525,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(212, 169);
+            this.label16.Location = new System.Drawing.Point(207, 163);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(40, 13);
             this.label16.TabIndex = 23;
@@ -512,7 +533,7 @@
             // 
             // empty
             // 
-            this.empty.Location = new System.Drawing.Point(317, 142);
+            this.empty.Location = new System.Drawing.Point(317, 139);
             this.empty.Name = "empty";
             this.empty.ReadOnly = true;
             this.empty.Size = new System.Drawing.Size(226, 20);
@@ -520,7 +541,7 @@
             // 
             // spindleInterlock
             // 
-            this.spindleInterlock.Location = new System.Drawing.Point(317, 118);
+            this.spindleInterlock.Location = new System.Drawing.Point(317, 115);
             this.spindleInterlock.Name = "spindleInterlock";
             this.spindleInterlock.ReadOnly = true;
             this.spindleInterlock.Size = new System.Drawing.Size(226, 20);
@@ -528,7 +549,7 @@
             // 
             // loadMaterial
             // 
-            this.loadMaterial.Location = new System.Drawing.Point(317, 95);
+            this.loadMaterial.Location = new System.Drawing.Point(317, 92);
             this.loadMaterial.Name = "loadMaterial";
             this.loadMaterial.ReadOnly = true;
             this.loadMaterial.Size = new System.Drawing.Size(226, 20);
@@ -536,7 +557,7 @@
             // 
             // changeMaterial
             // 
-            this.changeMaterial.Location = new System.Drawing.Point(317, 71);
+            this.changeMaterial.Location = new System.Drawing.Point(317, 68);
             this.changeMaterial.Name = "changeMaterial";
             this.changeMaterial.ReadOnly = true;
             this.changeMaterial.Size = new System.Drawing.Size(226, 20);
@@ -544,7 +565,7 @@
             // 
             // condition
             // 
-            this.condition.Location = new System.Drawing.Point(317, 48);
+            this.condition.Location = new System.Drawing.Point(317, 45);
             this.condition.Name = "condition";
             this.condition.ReadOnly = true;
             this.condition.Size = new System.Drawing.Size(226, 20);
@@ -552,7 +573,7 @@
             // 
             // endOfBar
             // 
-            this.endOfBar.Location = new System.Drawing.Point(317, 25);
+            this.endOfBar.Location = new System.Drawing.Point(317, 22);
             this.endOfBar.Name = "endOfBar";
             this.endOfBar.ReadOnly = true;
             this.endOfBar.Size = new System.Drawing.Size(226, 20);
@@ -561,7 +582,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(212, 143);
+            this.label9.Location = new System.Drawing.Point(207, 137);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(36, 13);
             this.label9.TabIndex = 16;
@@ -570,7 +591,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(212, 118);
+            this.label8.Location = new System.Drawing.Point(207, 112);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(83, 13);
             this.label8.TabIndex = 15;
@@ -579,7 +600,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(212, 28);
+            this.label7.Location = new System.Drawing.Point(207, 22);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(53, 13);
             this.label7.TabIndex = 14;
@@ -588,7 +609,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(212, 49);
+            this.label6.Location = new System.Drawing.Point(207, 43);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(30, 13);
             this.label6.TabIndex = 13;
@@ -597,25 +618,25 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(212, 72);
+            this.label3.Location = new System.Drawing.Point(207, 66);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(81, 13);
             this.label3.TabIndex = 12;
-            this.label3.Text = "ChangeMaterial";
+            this.label3.Text = "MaterialChange";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(212, 95);
+            this.label2.Location = new System.Drawing.Point(207, 89);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(68, 13);
             this.label2.TabIndex = 11;
-            this.label2.Text = "LoadMaterial";
+            this.label2.Text = "MaterialFeed";
             // 
             // iNMCY_B
             // 
             this.iNMCY_B.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iNMCY_B.Location = new System.Drawing.Point(10, 139);
+            this.iNMCY_B.Location = new System.Drawing.Point(5, 133);
             this.iNMCY_B.Name = "iNMCY_B";
             this.iNMCY_B.Size = new System.Drawing.Size(175, 17);
             this.iNMCY_B.TabIndex = 10;
@@ -625,7 +646,7 @@
             // iSPOK
             // 
             this.iSPOK.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iSPOK.Location = new System.Drawing.Point(10, 116);
+            this.iSPOK.Location = new System.Drawing.Point(5, 110);
             this.iSPOK.Name = "iSPOK";
             this.iSPOK.Size = new System.Drawing.Size(175, 17);
             this.iSPOK.TabIndex = 9;
@@ -635,7 +656,7 @@
             // iMATADV
             // 
             this.iMATADV.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iMATADV.Location = new System.Drawing.Point(10, 93);
+            this.iMATADV.Location = new System.Drawing.Point(5, 87);
             this.iMATADV.Name = "iMATADV";
             this.iMATADV.Size = new System.Drawing.Size(175, 17);
             this.iMATADV.TabIndex = 8;
@@ -645,7 +666,7 @@
             // iMATCHG
             // 
             this.iMATCHG.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iMATCHG.Location = new System.Drawing.Point(10, 70);
+            this.iMATCHG.Location = new System.Drawing.Point(5, 64);
             this.iMATCHG.Name = "iMATCHG";
             this.iMATCHG.Size = new System.Drawing.Size(175, 17);
             this.iMATCHG.TabIndex = 7;
@@ -655,7 +676,7 @@
             // iBFANML_B
             // 
             this.iBFANML_B.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iBFANML_B.Location = new System.Drawing.Point(10, 49);
+            this.iBFANML_B.Location = new System.Drawing.Point(5, 43);
             this.iBFANML_B.Name = "iBFANML_B";
             this.iBFANML_B.Size = new System.Drawing.Size(175, 17);
             this.iBFANML_B.TabIndex = 6;
@@ -665,57 +686,62 @@
             // iIN24
             // 
             this.iIN24.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iIN24.Location = new System.Drawing.Point(10, 26);
+            this.iIN24.Location = new System.Drawing.Point(5, 20);
             this.iIN24.Name = "iIN24";
             this.iIN24.Size = new System.Drawing.Size(175, 17);
             this.iIN24.TabIndex = 5;
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
-            // topCutComplete
+            // controllerMode
             // 
-            this.topCutComplete.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.topCutComplete.Location = new System.Drawing.Point(10, 162);
-            this.topCutComplete.Name = "topCutComplete";
-            this.topCutComplete.Size = new System.Drawing.Size(175, 17);
-            this.topCutComplete.TabIndex = 30;
-            this.topCutComplete.Text = "Top Cut Complete";
-            this.topCutComplete.UseVisualStyleBackColor = true;
-            this.topCutComplete.CheckedChanged += new System.EventHandler(this.topCutComplete_CheckedChanged);
+            this.controllerMode.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.controllerMode.Location = new System.Drawing.Point(10, 163);
+            this.controllerMode.Name = "controllerMode";
+            this.controllerMode.Size = new System.Drawing.Size(175, 17);
+            this.controllerMode.TabIndex = 35;
+            this.controllerMode.Text = "Automatic Mode";
+            this.controllerMode.UseVisualStyleBackColor = true;
+            this.controllerMode.CheckedChanged += new System.EventHandler(this.controllerMode_CheckedChanged);
             // 
-            // iRegister
+            // doorOpen
             // 
-            this.iRegister.Location = new System.Drawing.Point(317, 179);
-            this.iRegister.Name = "iRegister";
-            this.iRegister.ReadOnly = true;
-            this.iRegister.Size = new System.Drawing.Size(226, 20);
-            this.iRegister.TabIndex = 31;
+            this.doorOpen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.doorOpen.Location = new System.Drawing.Point(10, 232);
+            this.doorOpen.Name = "doorOpen";
+            this.doorOpen.Size = new System.Drawing.Size(175, 17);
+            this.doorOpen.TabIndex = 36;
+            this.doorOpen.Text = "Door Open";
+            this.doorOpen.UseVisualStyleBackColor = true;
+            this.doorOpen.CheckedChanged += new System.EventHandler(this.doorOpen_CheckedChanged);
             // 
-            // label20
+            // doorClosed
             // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(212, 179);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(48, 13);
-            this.label20.TabIndex = 32;
-            this.label20.Text = "iRegister";
+            this.doorClosed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.doorClosed.Location = new System.Drawing.Point(10, 254);
+            this.doorClosed.Name = "doorClosed";
+            this.doorClosed.Size = new System.Drawing.Size(175, 17);
+            this.doorClosed.TabIndex = 37;
+            this.doorClosed.Text = "Door Closed";
+            this.doorClosed.UseVisualStyleBackColor = true;
+            this.doorClosed.CheckedChanged += new System.EventHandler(this.doorClosed_CheckedChanged);
             // 
-            // label21
+            // door
             // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(212, 205);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(52, 13);
-            this.label21.TabIndex = 34;
-            this.label21.Text = "oRegister";
+            this.door.Location = new System.Drawing.Point(317, 230);
+            this.door.Name = "door";
+            this.door.ReadOnly = true;
+            this.door.Size = new System.Drawing.Size(226, 20);
+            this.door.TabIndex = 39;
             // 
-            // oRegister
+            // label17
             // 
-            this.oRegister.Location = new System.Drawing.Point(317, 205);
-            this.oRegister.Name = "oRegister";
-            this.oRegister.ReadOnly = true;
-            this.oRegister.Size = new System.Drawing.Size(226, 20);
-            this.oRegister.TabIndex = 33;
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(212, 232);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(55, 13);
+            this.label17.TabIndex = 38;
+            this.label17.Text = "DoorState";
             // 
             // Form1
             // 
@@ -789,20 +815,22 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.CheckBox loadFail;
         private System.Windows.Forms.CheckBox changeFail;
-        private System.Windows.Forms.TextBox stock;
-        private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox barLength;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.TextBox topCut;
+        private System.Windows.Forms.TextBox newBar;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.CheckBox iTOPCUT;
-        private System.Windows.Forms.TextBox oTopCut;
+        private System.Windows.Forms.TextBox mode;
         private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.CheckBox topCutComplete;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.TextBox iRegister;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.TextBox oRegister;
+        private System.Windows.Forms.CheckBox controllerMode;
+        private System.Windows.Forms.TextBox door;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.CheckBox doorClosed;
+        private System.Windows.Forms.CheckBox doorOpen;
     }
 }
 

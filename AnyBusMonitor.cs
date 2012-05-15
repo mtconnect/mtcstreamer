@@ -14,8 +14,6 @@ namespace Streamer
     using System.Collections;
     using MTConnect;
     using System.Xml.Linq;
-    using System.Net;
-    using System.IO;
 
     public class AnyBusMonitor
     {
@@ -30,6 +28,9 @@ namespace Streamer
         public bool oBFCHCL { get; set; }
         public bool ADVFail { get; set; }
         public bool CHGFail { get; set; }
+        public bool ControllerMode { get; set; }
+        public bool DoorOpen { get; set; }
+        public bool DoorClosed { get; set; }
 
         // Input registers from the Bar Feeder
         public bool iNMCY_B { get; set; }
@@ -41,48 +42,52 @@ namespace Streamer
         public bool iTOPCUT { get; set; }
         public bool LoadFail { get; set; }
         public bool ChangeFail { get; set; }
-        public bool TopCutComplete { get; set; }
         public UInt16 iRegsiter { get; set; }
         public UInt16 oRegsiter { get; set; }
 
         // Define the data items we're mirroring with these 
         // output variables
-        private MTCDataItem mLoad = new MTCDataItem("load_mat");
-        private MTCDataItem mChange = new MTCDataItem("change_mat");
+        private MTCDataItem mFeed = new MTCDataItem("feed");
+        private MTCDataItem mChange = new MTCDataItem("change");
         private MTCDataItem mChuck = new MTCDataItem("chuck_state");
         private MTCDataItem mSystem = new MTCDataItem("system");
         private MTCDataItem mLinkMode = new MTCDataItem("bf_link");
         private MTCDataItem mAvail = new MTCDataItem("avail");
-        private MTCDataItem mTopCut = new MTCDataItem("top_cut");
+        private MTCDataItem mMode = new MTCDataItem("mode");
+        private MTCDataItem mDoor = new MTCDataItem("door_state");
+
+        private bool endOfBar = false, newBar = false;
 
         // MTConnect Data Item Values
-        public string BFTopCut { get; set; }
-        public string BFLoadMaterial { get; set; }
-        public string BFChangeMaterial { get; set; }
+        public string BFMaterialFeed { get; set; }
+        public string BFMaterialChange { get; set; }
         public string BFEndOfBar { get; set; }
+        public string BFNewBar { get; set; }
         public string BFSpindleInterlock { get; set; }
         public string BFStock { get; set; }
         public string BFLength { get; set; }
         public string BFEmpty { get; set; }
         public string BFSystem { get; set; }
 
-        public string Load { get { return mLoad.Value; } }
-        public string TopCut { get { return mTopCut.Value; } }
+        public string Mode { get { return mMode.Value; } }
+        public string Feed { get { return mFeed.Value; } }
         public string Change { get { return mChange.Value; } }
         public string Chuck { get { return mChuck.Value; } }
         public string System { get { return mSystem.Value; } }
         public string LinkMode { get { return mLinkMode.Value; } }
+        public string DoorState { get { return mDoor.Value; } }
 
         public AnyBusMonitor(MTCAdapter adapter)
         {
             mAdapter = adapter;
-            mAdapter.AddDataItem(mTopCut);
-            mAdapter.AddDataItem(mLoad);
+            mAdapter.AddDataItem(mFeed);
             mAdapter.AddDataItem(mChange);
             mAdapter.AddDataItem(mChuck);
             mAdapter.AddDataItem(mSystem);
             mAdapter.AddDataItem(mLinkMode);
             mAdapter.AddDataItem(mAvail);
+            mAdapter.AddDataItem(mMode);
+            mAdapter.AddDataItem(mDoor);
 
             mAvail.Value = "AVAILABLE";
 
@@ -99,27 +104,19 @@ namespace Streamer
             if (oBFCDM && oALMAB_B)
             {
                 if (ADVFail)
-                    mLoad.Value = "FAIL";
+                    mFeed.Value = "FAIL";
                 else if (CHGFail)
                     mChange.Value = "FAIL";
                 else
                 {
-                    if (TopCutComplete)
-                        mTopCut.Value = "COMPLETE";
-                    else if (iTOPCUT)
-                        mTopCut.Value = "ACTIVE";
-                    else
-                        mTopCut.Value = "READY";
-
-                    mLoad.Value = oMATADV ? "ACTIVE" : "READY";
+                    mFeed.Value = oMATADV ? "ACTIVE" : "READY";
                     mChange.Value = oMATCHG ? "ACTIVE" : "READY";
                 }   
             }
             else
             {
-                mLoad.Value = "NOT_READY";
+                mFeed.Value = "NOT_READY";
                 mChange.Value = "NOT_READY";
-                mTopCut.Value = "NOT_READY";
             }
 
 
@@ -130,8 +127,16 @@ namespace Streamer
             else
                 mChuck.Value = "UNLATCHED";
 
+            if (DoorOpen && !DoorClosed)
+                mDoor.Value = "OPEN";
+            else if (DoorClosed && !DoorOpen)
+                mDoor.Value = "CLOSED";
+            else
+                mDoor.Value = "UNLATCHED";
+
             mSystem.Value = oALMAB_B ? "normal||||" : "fault||||Alarm A or B";
             mLinkMode.Value = oBFCDM ? "ENABLED" : "DISABLED";
+            mMode.Value = ControllerMode ? "AUTOMATIC" : "MANUAL";
 
             WriteToAnyBus();
 
@@ -149,41 +154,46 @@ namespace Streamer
             // Check each event, for the two interfaces, we'll handle
             // only the complete state, since that is what we're limited 
             // to...
-            if (element.Name.LocalName == "LoadMaterial" || element.Name.LocalName == "ChangeMaterial")
+            switch (element.Name.LocalName)
             {
-                HandleInterface(element);
-            }
-            else if (element.Name.LocalName == "EndOfBar")
-            {
-                this.BFEndOfBar = element.Value;
-            }
-            else if (element.Name.LocalName == "TopCut")
-            {
-                this.iTOPCUT = element.Value == "ACTIVE";;
-                this.BFTopCut = element.Value;
-            }
-            else if (element.Name.LocalName == "SpindleInterlock")
-            {
-                this.iSPOK = element.Value == "UNLATCHED";
-                this.BFSpindleInterlock = element.Value;
-            }
-            else if (element.Name.LocalName == "RemainingMaterial")
-            {
-                this.BFStock = element.Value;
-            }
-            else if (element.Name.LocalName == "BarLength")
-            {
-                this.BFLength = element.Value;
-            }
-            else
-            {
-                Console.WriteLine("Unknown node: " + element.Name);
+                case "MaterialChange": goto case "MaterialFeed";
+                case "MaterialRetract": goto case "MaterialFeed";
+                case "MaterialFeed":
+                    HandleInterface(element);
+                    break;
+
+                case "EndOfBar":
+                    this.BFEndOfBar = element.Value;
+                    break;
+
+                case "NewBar":
+                    this.BFNewBar = element.Value;
+                    break;
+
+                case "SpindleInterlock":
+                    this.iSPOK = element.Value == "UNLATCHED";
+                    this.BFSpindleInterlock = element.Value;
+                    break;
+
+                case "Parts":
+                    this.BFStock = element.Value;
+                    break;
+
+                case "Length":
+                    this.BFLength = element.Value;
+                    break;
+
+                default:
+                    Console.WriteLine("Unknown node: " + element.Name);
+                    break;
             }
 
-            if (element.Name.LocalName == "EndOfBar" || element.Name.LocalName == "TopCut")
-            {
-                this.iIN24 = element.Value == "ACTIVE";
-            }
+            if (element.Name.LocalName == "EndOfBar")
+                endOfBar = element.Value == "YES";
+            if (element.Name.LocalName == "NewBar")
+                newBar = element.Value == "YES";
+            this.iIN24 = (newBar || endOfBar);
+            this.iTOPCUT = newBar;
         }
 
         private void HandleInterface(XElement node)
@@ -194,24 +204,25 @@ namespace Streamer
                 this.iBFANML_B = false;
             else
                 this.iBFANML_B = true;
-            if (node.Name.LocalName == "LoadMaterial")
+
+            if (node.Name.LocalName == "MaterialFeed")
             {
                 this.iMATADV = completed;
-                this.BFLoadMaterial = node.Value;
+                this.BFMaterialFeed = node.Value;
                 this.LoadFail = failed;
                 if (completed)
                 {
-                    this.oMATADV = false;
+                    //this.oMATADV = false;
                 }
             }
-            else if (node.Name.LocalName == "ChangeMaterial")
+            else if (node.Name.LocalName == "MaterialChange")
             {
                 this.iMATCHG = completed;
-                this.BFChangeMaterial = node.Value;
+                this.BFMaterialChange = node.Value;
                 this.ChangeFail = failed;
                 if (completed)
                 {
-                    this.oMATCHG = false;
+                    //this.oMATCHG = false;
                 }
             }
             else
@@ -285,14 +296,13 @@ namespace Streamer
             this.ChangeFail = false;
 
             this.BFEndOfBar = "";
-            this.BFLoadMaterial = "";
+            this.BFMaterialFeed = "";
             this.BFSpindleInterlock = "";
             this.BFStock = "";
             this.BFLength = "";
-            this.BFChangeMaterial = "";
+            this.BFMaterialChange = "";
             this.BFEmpty = "";
             this.BFSystem = "";
-            this.BFTopCut = "";
 
             WriteToAnyBus();
         }

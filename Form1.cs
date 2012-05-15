@@ -97,11 +97,11 @@ namespace Streamer
             
             // Update output text
             oLinkMode.Text = mAnyBus.LinkMode;
-            oLoadMaterial.Text = mAnyBus.Load;
+            oLoadMaterial.Text = mAnyBus.Feed;
             oChangeMaterial.Text = mAnyBus.Change;
             oChuckState.Text = mAnyBus.Chuck;
             oSystem.Text = mAnyBus.System;
-            oTopCut.Text = mAnyBus.TopCut;
+            
 
             // Special update for interfaces auto-reset
             oMATADV.Checked = mAnyBus.oMATADV;
@@ -118,14 +118,15 @@ namespace Streamer
 
             // Update input text
             endOfBar.Text = mAnyBus.BFEndOfBar;
+            newBar.Text = mAnyBus.BFNewBar;
             condition.Text = mAnyBus.BFSystem;
-            loadMaterial.Text = mAnyBus.BFLoadMaterial;
-            changeMaterial.Text = mAnyBus.BFChangeMaterial;
+            loadMaterial.Text = mAnyBus.BFMaterialFeed;
+            changeMaterial.Text = mAnyBus.BFMaterialChange;
             empty.Text = mAnyBus.BFEmpty;
             spindleInterlock.Text = mAnyBus.BFSpindleInterlock;
             barLength.Text = mAnyBus.BFLength;
-            stock.Text = mAnyBus.BFStock;
-            topCut.Text = mAnyBus.BFTopCut;
+            mode.Text = mAnyBus.Mode;
+            door.Text = mAnyBus.DoorState;
 
             iRegister.Text = "0x" + Convert.ToString(mAnyBus.iRegsiter, 16);
             oRegister.Text = "0x" + Convert.ToString(mAnyBus.oRegsiter, 16);
@@ -179,9 +180,21 @@ namespace Streamer
             UpdateOutput();
         }
 
-        private void topCutComplete_CheckedChanged(object sender, EventArgs e)
+        private void controllerMode_CheckedChanged(object sender, EventArgs e)
         {
-            this.mAnyBus.TopCutComplete = topCutComplete.Checked;
+            this.mAnyBus.ControllerMode = controllerMode.Checked;
+            UpdateOutput();
+        }
+
+        private void doorOpen_CheckedChanged(object sender, EventArgs e)
+        {
+            this.mAnyBus.DoorOpen = doorOpen.Checked;
+            UpdateOutput();
+        }
+
+        private void doorClosed_CheckedChanged(object sender, EventArgs e)
+        {
+            this.mAnyBus.DoorClosed = doorClosed.Checked;
             UpdateOutput();
         }
     }

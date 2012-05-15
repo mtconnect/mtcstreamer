@@ -29,15 +29,21 @@
             <MaterialLoader name="material" id="ml2">
               <DataItems>
                 <!-- Interfaces -->
-                <DataItem type="LOAD_MATERIAL" category="EVENT" id="lm2" name="load_mat" />
-                <DataItem type="CHANGE_MATERIAL" category="EVENT" id="cm2" name="change_mat" />
-                <DataItem type="TOP_CUT" category="EVENT" id="tc2" name="top_cut" />
+                <DataItem type="MATERIAL_FEED" subType="REQUEST" category="EVENT" id="rlm" name="load" />
+                <DataItem type="MATERIAL_CHANGE" subType="REQUEST" category="EVENT" id="rcm" name="change" />
+                <DataItem type="MATERIAL_RETRACT" subType="REQUEST" category="EVENT" id="rmr" name="retract" />
+                <DataItem type="PART_CHANGE" subType="REQUEST" category="EVENT" id="rpc" name="part_change" />
                 
                 <DataItem type="LINK_STATE" category="EVENT" id="ls" name="bf_link" />
               </DataItems>
             </MaterialLoader>
           </Components>
         </Interfaces>
+        <Door name="door" id="dr">
+  			  <DataItems>
+  				  <DataItem type="DOOR_STATE" category="EVENT" id="cdrs" name="door_state"/>
+  			  </DataItems>
+        </Door>        
       </Components>
     </Device>
   </Devices>

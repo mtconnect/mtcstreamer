@@ -10,38 +10,41 @@ require 'mtc_context'
 
 module BarFeeder
   class BarFeederContext < MTConnect::Context
-    attr_accessor :link_state, :load_material, :change_material, :chuck_state, :fault
+    attr_accessor :link_state, :material_feed, :material_change, :chuck_state, :fault,
+                  :controller_mode, :door_state
   
     include MTConnect
   
     def initialize(port = 7878)
       super(port)
       
+      # Devce/Controller
       @adapter.data_items << (@availability_di = DataItem.new('avail'))
       @adapter.data_items << (@mode_di = DataItem.new('mode'))
       @adapter.data_items << (@exec_di = DataItem.new('exec'))
-      @adapter.data_items << (@load_material_di = DataItem.new('load'))
-      @adapter.data_items << (@change_material_di = DataItem.new('change'))
-      @adapter.data_items << (@spindle_interlock_di = DataItem.new('s_inter'))
-      @adapter.data_items << (@end_of_bar_di = DataItem.new('eob'))
-      @adapter.data_items << (@remain_di = DataItem.new('remain'))
-      @adapter.data_items << (@length_di = DataItem.new('length'))
       @adapter.data_items << (@system_di = Condition.new('system'))
-      @adapter.data_items << (@fill_di = Condition.new('fill'))
-      @adapter.data_items << (@top_cut_di = DataItem.new('top_cut'))
-
-      # Initialize data items
-      @availability_di.value = "AVAILABLE"
-      @exec_di.value = 'READY'
-      @mode_di.value = 'MANUAL'
-      @end_of_bar_di.value = 'ACTIVE'
-      @spindle_interlock_di.value = 'UNLATCHED'
-      @remain_di.value = @remaining_material
-      @length_di.value = @remaining_length
-      @top_cut_di.value = 'READY'
-      @fill_di.normal
-      @system_di.normal
       
+      # Interfaces
+      @adapter.data_items << (@material_feed_di = DataItem.new('load'))
+      @adapter.data_items << (@material_change_di = DataItem.new('change'))
+      @adapter.data_items << (@retract_di = DataItem.new('retract'))
+      @adapter.data_items << (@part_change_di = DataItem.new('part_change'))
+      
+      # Interlocks
+      @adapter.data_items << (@spindle_interlock_di = DataItem.new('s_inter'))
+      @adapter.data_items << (@chuck_interlock_di = DataItem.new('c_unclamp'))
+      
+      # Stock
+      @adapter.data_items << (@end_of_bar_di = DataItem.new('eob'))
+      @adapter.data_items << (@new_bar_di = DataItem.new('newb'))
+      @adapter.data_items << (@workpiece_di = DataItem.new('work_id'))      
+      @adapter.data_items << (@parts_di = DataItem.new('parts'))
+      @adapter.data_items << (@length_di = DataItem.new('length'))
+      
+      # Magazine
+      @adapter.data_items << (@fill_di = Condition.new('fill_cond'))
+      @adapter.data_items << (@fill_level_di = DataItem.new('fill'))
+
       # Initialize bar feeder state...
       @mag_empty = false
       @remaining_material = 5
@@ -49,8 +52,23 @@ module BarFeeder
       @part_length = 24.2
       @chuck_open = false
       @end_of_bar = true
-      @request_top_cut = false
-            
+      @bar_length = 100.0
+
+      # Initialize data items
+      @availability_di.value = "AVAILABLE"
+      @exec_di.value = 'READY'
+      @mode_di.value = 'MANUAL'
+      @end_of_bar_di.value = 'YES'
+      @spindle_interlock_di.value = 'UNLATCHED'
+      @chuck_interlock_di.value = 'UNLATCHED'
+      
+      @parts_di.value = 0.0
+      @length_di.value = 0.0
+      
+      @fill_level_di.value = @remaining_material
+      @fill_di.normal
+      @system_di.normal
+      
       @adapter.start    
     end
   
@@ -64,16 +82,18 @@ module BarFeeder
         @system_di.add('fault', 'CNC has disconnected', '3')
       end
       if @end_of_bar
-        @end_of_bar_di.value = 'ACTIVE'
+        @end_of_bar_di.value = 'YES'
       else
-        @end_of_bar_di.value = 'READY'
+        @end_of_bar_di.value = 'NO'
       end
     end
   
     def activate
+      p @link_state, @faults, @chuck_open, @door_state, @controller_mode
       if @mag_empty
         @statemachine.empty
-      elsif @link_state == "ENABLED" and @faults.empty? and @chuck_open
+      elsif @link_state == "ENABLED" and @faults.empty? and @chuck_open and
+            @door_state == "CLOSED" and @controller_mode == "AUTOMATIC"
         puts "Becomming operational"
         @statemachine.make_operational
       else
@@ -84,61 +104,58 @@ module BarFeeder
   
     def interfaces_not_ready
       @adapter.gather do 
-        @load_material_di.value = 'NOT_READY'
-        @change_material_di.value = 'NOT_READY'
-        @top_cut_di.value = 'NOT_READY'
+        @material_feed_di.value = 'NOT_READY'
+        @material_change_di.value = 'NOT_READY'
         @mode_di.value = 'MANUAL'
         add_conditions
       end
     end
 
     def interfaces_ready
+      p @remaining_length, @part_length
       if @remaining_length < @part_length
-        @mode_di.value = 'AUTOMATIC'
         @adapter.gather do 
-          @load_material_di.value = 'NOT_READY'
+          @mode_di.value = 'AUTOMATIC'
+          @material_feed_di.value = 'NOT_READY'
         end
         @statemachine.bar_finished
-      elsif @request_top_cut
-        @statemachine.top_cut
       else
         @adapter.gather do 
-          @load_material_di.value = 'READY'
-          @change_material_di.value = 'READY'
-          @top_cut_di.value = 'READY'
+          @material_feed_di.value = 'READY'
+          @material_change_di.value = 'READY'
           @mode_di.value = 'AUTOMATIC'
           add_conditions
         end
       end
     end
     
-    def begin_load_material
+    def begin_material_feed
       unless @chuck_open
         @statemachine.chuck_state_closed
       else
         @adapter.gather do 
           @spindle_interlock_di.value = 'LATCHED'
-          @load_material_di.value = 'ACTIVE'
+          @material_feed_di.value = 'ACTIVE'
           add_conditions
         end
         Thread.new do
           sleep 1
-          @statemachine.load_material_completed
+          @statemachine.material_feed_completed
         end
       end
     end
   
-    def begin_change_material
+    def begin_material_change
       unless @chuck_open
         @statemachine.chuck_state_closed
       else
         @adapter.gather do 
-          @change_material_di.value = 'ACTIVE'
+          @material_change_di.value = 'ACTIVE'
           add_conditions
         end
         Thread.new do
           sleep 2
-          @statemachine.change_material_completed
+          @statemachine.material_change_completed
         end
       end
     end
@@ -155,33 +172,38 @@ module BarFeeder
         @statemachine.empty
       else      
         @adapter.gather do 
-          @load_material_di.value = 'NOT_READY'
-          @change_material_di.value = @chuck_open ? 'READY' : 'NOT_READY'
+          @material_feed_di.value = 'NOT_READY'
+          @material_change_di.value = @chuck_open ? 'READY' : 'NOT_READY'
           add_conditions
         end
       end
     end
 
-    def load_material_completed
+    def material_feed_completed
       @remaining_length -= @part_length
       puts "**** Remaining length: #{@remaining_length}"
       @adapter.gather do 
         @spindle_interlock_di.value = 'UNLATCHED'
-        @load_material_di.value = 'COMPLETE'
+        @material_feed_di.value = 'COMPLETE'
         @length_di.value =  @remaining_length
+        @new_bar_di.value = 'NO'
+        
         add_conditions
       end
     end
   
-    def change_material_completed
+    def material_change_completed
       if @remaining_material > 0
         @remaining_material -= 1
         puts "**** Remaining bars: #{@remaining_material}"
-        @remain_di.value = @remaining_material
-        @remaining_length = 100.0
+        @fill_level_di.value = @remaining_material
+        @remaining_length = @bar_length
+        @new_bar_di.value = 'YES'
+        @end_of_bar_di.value = 'NO'
+        @end_of_bar = false
       end
       @adapter.gather do 
-        @change_material_di.value = 'COMPLETE'
+        @material_change_di.value = 'COMPLETE'
         @length_di.value =  @remaining_length          
         add_conditions
       end
@@ -193,21 +215,21 @@ module BarFeeder
       @mag_empty = false
       @adapter.gather do
         @length_di.value =  @remaining_length          
-        @remain_di.value = @remaining_material
+        @fill_level_di.value = @remaining_material
         add_conditions
       end
     end
     
-    def load_material_failed
+    def material_feed_failed
       @adapter.gather do 
-        @load_material_di.value = 'FAIL'
+        @material_feed_di.value = 'FAIL'
         add_conditions
       end
     end
   
-    def change_material_failed
+    def material_change_failed
       @adapter.gather do 
-        @change_material_di.value = 'FAIL'
+        @material_change_di.value = 'FAIL'
         add_conditions
       end
     end
@@ -225,38 +247,7 @@ module BarFeeder
   
     def chuck_not_open
       @chuck_open = false
-    end
-        
-    def check_top_cut
-      if @end_of_bar
-        @request_top_cut = true
-      end
-    end
-      
-    def top_cut
-      @adapter.gather do 
-        @load_material_di.value = 'READY'
-        @top_cut_di.value = 'ACTIVE'
-        add_conditions
-      end
-    end
-    
-    def top_cut_completed
-      @adapter.gather do 
-        @top_cut_di.value = 'READY'
-        @end_of_bar = false
-        @request_top_cut = false
-        add_conditions
-      end
-    end
-    
-    def top_cut_fail
-      @adapter.gather do 
-        @top_cut_di.value = 'FAIL'
-        @end_of_bar = false
-        add_conditions
-      end
-    end
+    end        
   end
 
   @bar_feeder = Statemachine.build do
@@ -282,24 +273,26 @@ module BarFeeder
           
           event :link_state_enabled, :activated
           event :normal, :activated
+          event :door_state_closed, :activated
+          event :controller_mode_automatic, :activated
           
-          event :load_material_active, :load_fail
-          event :change_material_active, :change_fail
+          event :material_feed_active, :load_fail
+          event :material_change_active, :change_fail
           event :fault, :fault
         end
   
         state :fault do
           default :fault
           event :normal, :activated
-          event :load_material_active, :load_fail
-          event :change_material_active, :change_fail
+          event :material_feed_active, :load_fail
+          event :material_change_active, :change_fail
         end
       
         state :empty do
           default :empty
           event :filled, :activated, :refill
-          event :load_material_active, :load_fail
-          event :change_material_active, :change_fail
+          event :material_feed_active, :load_fail
+          event :material_change_active, :change_fail
         end
       end
   
@@ -312,14 +305,14 @@ module BarFeeder
     
       state :load_fail do
         default :load_fail
-        on_entry :load_material_failed
-        event :load_material_fail, :disabled_H
+        on_entry :material_feed_failed
+        event :material_feed_fail, :disabled_H
       end
 
       state :change_fail do
         default :change_fail
-        on_entry :change_material_failed
-        event :change_material_fail, :disabled_H
+        on_entry :material_change_failed
+        event :material_change_fail, :disabled_H
       end
   
       superstate :operational do
@@ -328,11 +321,10 @@ module BarFeeder
         
         state :ready do
           default :ready
-          event :top_cut, :top_cut
           on_entry :interfaces_ready
         end
                 
-        [:load_material, :change_material].each do |interface|
+        [:material_feed, :material_change].each do |interface|
           active = "#{interface}_active".to_sym
           fail = "#{interface}_fail".to_sym
           failed = "#{interface}_failed".to_sym
@@ -388,37 +380,20 @@ module BarFeeder
         state :end_of_bar do
           on_entry :end_of_bar
           default :end_of_bar
-          event :load_material_active, :load_material_fail_eob
-          event :change_material_active, :change_material
+          event :material_feed_active, :material_feed_fail_eob
+          event :material_change_active, :material_change
           event :empty, :empty
         end
   
-        state :load_material_fail_eob do
-          on_entry :load_material_failed
-          default :load_material_fail_eob
-          event :load_material_fail, :end_of_bar
+        state :material_feed_fail_eob do
+          on_entry :material_feed_failed
+          default :material_feed_fail_eob
+          event :material_feed_fail, :end_of_bar
         end
         
         # A few other states
         trans :ready, :bar_finished, :end_of_bar
-        trans :load_material_complete, :load_material_ready, :ready, :check_top_cut
-        
-        state :top_cut do
-          on_entry :top_cut
-          event :top_cut_complete, :ready, :top_cut_completed
-          event :top_cut_fail, :top_cut_fail
-          
-          event :chuck_state_open, :top_cut, :chuck_open
-          event :chuck_state_unlatched, :top_cut, :chuck_not_open
-          event :chuck_state_closed, :top_cut, :chuck_not_open
-        end
-        
-        state :top_cut_fail do
-          default :top_cut_fail
-          on_entry :top_cut_fail
-          event :top_cut_ready, :ready, :top_cut_completed
-        end
-        
+                
         # handle some failure conditions
         event :disconnected, :disabled
         event :fault, :fault, :faulted
