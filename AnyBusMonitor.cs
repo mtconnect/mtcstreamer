@@ -190,6 +190,10 @@ namespace Streamer
         {
             bool completed = node.Value == "COMPLETE";
             bool failed = node.Value == "FAIL";
+            if (failed)
+                this.iBFANML_B = false;
+            else
+                this.iBFANML_B = true;
             if (node.Name.LocalName == "LoadMaterial")
             {
                 this.iMATADV = completed;
