@@ -37,9 +37,9 @@ namespace Streamer
         public bool iMATADV { get; set; }
         public bool iMATCHG { get; set; }
         public bool iIN24 { get; set; }
+        public bool iIN23 { get; set; }
         public bool iSPOK { get; set; }
         public bool iBFANML_B { get; set; }
-        public bool iTOPCUT { get; set; }
         public bool LoadFail { get; set; }
         public bool ChangeFail { get; set; }
         public UInt16 iRegsiter { get; set; }
@@ -56,15 +56,13 @@ namespace Streamer
         private MTCDataItem mMode = new MTCDataItem("mode");
         private MTCDataItem mDoor = new MTCDataItem("door_state");
 
-        private bool endOfBar = false, newBar = false;
-
         // MTConnect Data Item Values
         public string BFMaterialFeed { get; set; }
         public string BFMaterialChange { get; set; }
+        public string BFAuxEndOfBar { get; set; }
         public string BFEndOfBar { get; set; }
-        public string BFNewBar { get; set; }
         public string BFSpindleInterlock { get; set; }
-        public string BFStock { get; set; }
+        public string BFWorkpieceId { get; set; }
         public string BFLength { get; set; }
         public string BFEmpty { get; set; }
         public string BFSystem { get; set; }
@@ -164,10 +162,12 @@ namespace Streamer
 
                 case "EndOfBar":
                     this.BFEndOfBar = element.Value;
+                    this.iIN24 = element.Value == "YES";
                     break;
 
-                case "NewBar":
-                    this.BFNewBar = element.Value;
+                case "AuxiliaryEndOfBar":
+                    this.BFAuxEndOfBar = element.Value;
+                    this.iIN23 = element.Value == "YES";
                     break;
 
                 case "SpindleInterlock":
@@ -175,8 +175,8 @@ namespace Streamer
                     this.BFSpindleInterlock = element.Value;
                     break;
 
-                case "Parts":
-                    this.BFStock = element.Value;
+                case "WorkpieceId":
+                    this.BFWorkpieceId = element.Value;
                     break;
 
                 case "Length":
@@ -186,14 +186,7 @@ namespace Streamer
                 default:
                     Console.WriteLine("Unknown node: " + element.Name);
                     break;
-            }
-
-            if (element.Name.LocalName == "EndOfBar")
-                endOfBar = element.Value == "YES";
-            if (element.Name.LocalName == "NewBar")
-                newBar = element.Value == "YES";
-            this.iIN24 = (newBar || endOfBar);
-            this.iTOPCUT = newBar;
+            }                
         }
 
         private void HandleInterface(XElement node)
@@ -291,14 +284,14 @@ namespace Streamer
             this.iMATCHG = false;
             this.iIN24 = false;
             this.iSPOK = false;
-            this.iTOPCUT = false;
+            this.iIN23 = false;
             this.LoadFail = false;
             this.ChangeFail = false;
 
             this.BFEndOfBar = "";
             this.BFMaterialFeed = "";
             this.BFSpindleInterlock = "";
-            this.BFStock = "";
+            this.BFWorkpieceId = "";
             this.BFLength = "";
             this.BFMaterialChange = "";
             this.BFEmpty = "";

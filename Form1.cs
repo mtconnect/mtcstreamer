@@ -113,12 +113,12 @@ namespace Streamer
             iMATADV.Checked = mAnyBus.iMATADV;
             iMATCHG.Checked = mAnyBus.iMATCHG;
             iIN24.Checked = mAnyBus.iIN24;
+            iIN23.Checked = mAnyBus.iIN23;
             iSPOK.Checked = mAnyBus.iSPOK;
-            iTOPCUT.Checked = mAnyBus.iTOPCUT;
 
             // Update input text
             endOfBar.Text = mAnyBus.BFEndOfBar;
-            newBar.Text = mAnyBus.BFNewBar;
+            auxEndOfBar.Text = mAnyBus.BFAuxEndOfBar;
             condition.Text = mAnyBus.BFSystem;
             loadMaterial.Text = mAnyBus.BFMaterialFeed;
             changeMaterial.Text = mAnyBus.BFMaterialChange;

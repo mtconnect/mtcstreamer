@@ -36,7 +36,7 @@ module BarFeeder
       
       # Stock
       @adapter.data_items << (@end_of_bar_di = DataItem.new('eob'))
-      @adapter.data_items << (@new_bar_di = DataItem.new('newb'))
+      @adapter.data_items << (@aux_end_of_bar_di = DataItem.new('aux'))
       @adapter.data_items << (@workpiece_di = DataItem.new('work_id'))      
       @adapter.data_items << (@parts_di = DataItem.new('parts'))
       @adapter.data_items << (@length_di = DataItem.new('length'))
@@ -89,7 +89,6 @@ module BarFeeder
     end
   
     def activate
-      p @link_state, @faults, @chuck_open, @door_state, @controller_mode
       if @mag_empty
         @statemachine.empty
       elsif @link_state == "ENABLED" and @faults.empty? and @chuck_open and
@@ -107,12 +106,13 @@ module BarFeeder
         @material_feed_di.value = 'NOT_READY'
         @material_change_di.value = 'NOT_READY'
         @mode_di.value = 'MANUAL'
+        @chuck_interlock_di.value = 'UNLATCHED'
         add_conditions
       end
     end
 
     def interfaces_ready
-      p @remaining_length, @part_length
+      @chuck_interlock_di.value = 'LATCHED'
       if @remaining_length < @part_length
         @adapter.gather do 
           @mode_di.value = 'AUTOMATIC'
@@ -186,7 +186,6 @@ module BarFeeder
         @spindle_interlock_di.value = 'UNLATCHED'
         @material_feed_di.value = 'COMPLETE'
         @length_di.value =  @remaining_length
-        @new_bar_di.value = 'NO'
         
         add_conditions
       end
@@ -198,7 +197,6 @@ module BarFeeder
         puts "**** Remaining bars: #{@remaining_material}"
         @fill_level_di.value = @remaining_material
         @remaining_length = @bar_length
-        @new_bar_di.value = 'YES'
         @end_of_bar_di.value = 'NO'
         @end_of_bar = false
       end
@@ -341,6 +339,8 @@ module BarFeeder
             event ready, fail
             event completed, complete
             event fail, cnc_fail
+            
+            event :controller_mode_manual, fail
             
             # Handle the chuck state failures
             event :chuck_state_unlatched, fail, :chuck_not_open

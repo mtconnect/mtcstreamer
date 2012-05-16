@@ -38,6 +38,11 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.stopOperation = new System.Windows.Forms.GroupBox();
+            this.door = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.doorClosed = new System.Windows.Forms.CheckBox();
+            this.doorOpen = new System.Windows.Forms.CheckBox();
+            this.controllerMode = new System.Windows.Forms.CheckBox();
             this.label21 = new System.Windows.Forms.Label();
             this.oRegister = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -64,9 +69,9 @@
             this.oBFCDM = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.newBar = new System.Windows.Forms.TextBox();
+            this.auxEndOfBar = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
-            this.iTOPCUT = new System.Windows.Forms.CheckBox();
+            this.iIN23 = new System.Windows.Forms.CheckBox();
             this.barLength = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.empty = new System.Windows.Forms.TextBox();
@@ -87,11 +92,6 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
-            this.controllerMode = new System.Windows.Forms.CheckBox();
-            this.doorOpen = new System.Windows.Forms.CheckBox();
-            this.doorClosed = new System.Windows.Forms.CheckBox();
-            this.door = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -223,10 +223,60 @@
             this.stopOperation.TabStop = false;
             this.stopOperation.Text = "Machine Tool";
             // 
+            // door
+            // 
+            this.door.Location = new System.Drawing.Point(317, 179);
+            this.door.Name = "door";
+            this.door.ReadOnly = true;
+            this.door.Size = new System.Drawing.Size(226, 20);
+            this.door.TabIndex = 39;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(212, 181);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(55, 13);
+            this.label17.TabIndex = 38;
+            this.label17.Text = "DoorState";
+            // 
+            // doorClosed
+            // 
+            this.doorClosed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.doorClosed.Location = new System.Drawing.Point(10, 254);
+            this.doorClosed.Name = "doorClosed";
+            this.doorClosed.Size = new System.Drawing.Size(175, 17);
+            this.doorClosed.TabIndex = 37;
+            this.doorClosed.Text = "Door Closed";
+            this.doorClosed.UseVisualStyleBackColor = true;
+            this.doorClosed.CheckedChanged += new System.EventHandler(this.doorClosed_CheckedChanged);
+            // 
+            // doorOpen
+            // 
+            this.doorOpen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.doorOpen.Location = new System.Drawing.Point(10, 232);
+            this.doorOpen.Name = "doorOpen";
+            this.doorOpen.Size = new System.Drawing.Size(175, 17);
+            this.doorOpen.TabIndex = 36;
+            this.doorOpen.Text = "Door Open";
+            this.doorOpen.UseVisualStyleBackColor = true;
+            this.doorOpen.CheckedChanged += new System.EventHandler(this.doorOpen_CheckedChanged);
+            // 
+            // controllerMode
+            // 
+            this.controllerMode.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.controllerMode.Location = new System.Drawing.Point(10, 163);
+            this.controllerMode.Name = "controllerMode";
+            this.controllerMode.Size = new System.Drawing.Size(175, 17);
+            this.controllerMode.TabIndex = 35;
+            this.controllerMode.Text = "Automatic Mode";
+            this.controllerMode.UseVisualStyleBackColor = true;
+            this.controllerMode.CheckedChanged += new System.EventHandler(this.controllerMode_CheckedChanged);
+            // 
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(212, 205);
+            this.label21.Location = new System.Drawing.Point(212, 246);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(52, 13);
             this.label21.TabIndex = 34;
@@ -234,7 +284,7 @@
             // 
             // oRegister
             // 
-            this.oRegister.Location = new System.Drawing.Point(317, 205);
+            this.oRegister.Location = new System.Drawing.Point(317, 246);
             this.oRegister.Name = "oRegister";
             this.oRegister.ReadOnly = true;
             this.oRegister.Size = new System.Drawing.Size(226, 20);
@@ -243,7 +293,7 @@
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(212, 179);
+            this.label20.Location = new System.Drawing.Point(212, 220);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(48, 13);
             this.label20.TabIndex = 32;
@@ -251,7 +301,7 @@
             // 
             // iRegister
             // 
-            this.iRegister.Location = new System.Drawing.Point(317, 179);
+            this.iRegister.Location = new System.Drawing.Point(317, 220);
             this.iRegister.Name = "iRegister";
             this.iRegister.ReadOnly = true;
             this.iRegister.Size = new System.Drawing.Size(226, 20);
@@ -457,9 +507,9 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.newBar);
+            this.groupBox3.Controls.Add(this.auxEndOfBar);
             this.groupBox3.Controls.Add(this.label18);
-            this.groupBox3.Controls.Add(this.iTOPCUT);
+            this.groupBox3.Controls.Add(this.iIN23);
             this.groupBox3.Controls.Add(this.barLength);
             this.groupBox3.Controls.Add(this.label16);
             this.groupBox3.Controls.Add(this.empty);
@@ -487,32 +537,32 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Bar Feeder Status";
             // 
-            // newBar
+            // auxEndOfBar
             // 
-            this.newBar.Location = new System.Drawing.Point(317, 189);
-            this.newBar.Name = "newBar";
-            this.newBar.ReadOnly = true;
-            this.newBar.Size = new System.Drawing.Size(226, 20);
-            this.newBar.TabIndex = 29;
+            this.auxEndOfBar.Location = new System.Drawing.Point(317, 189);
+            this.auxEndOfBar.Name = "auxEndOfBar";
+            this.auxEndOfBar.ReadOnly = true;
+            this.auxEndOfBar.Size = new System.Drawing.Size(226, 20);
+            this.auxEndOfBar.TabIndex = 29;
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(207, 190);
+            this.label18.Location = new System.Drawing.Point(207, 191);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(45, 13);
+            this.label18.Size = new System.Drawing.Size(98, 13);
             this.label18.TabIndex = 28;
-            this.label18.Text = "NewBar";
+            this.label18.Text = "Auxillary End of Bar";
             // 
-            // iTOPCUT
+            // iIN23
             // 
-            this.iTOPCUT.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iTOPCUT.Location = new System.Drawing.Point(5, 157);
-            this.iTOPCUT.Name = "iTOPCUT";
-            this.iTOPCUT.Size = new System.Drawing.Size(175, 17);
-            this.iTOPCUT.TabIndex = 27;
-            this.iTOPCUT.Text = "iTOPCUT - Top Cut";
-            this.iTOPCUT.UseVisualStyleBackColor = true;
+            this.iIN23.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.iIN23.Location = new System.Drawing.Point(5, 157);
+            this.iIN23.Name = "iIN23";
+            this.iIN23.Size = new System.Drawing.Size(175, 17);
+            this.iIN23.TabIndex = 27;
+            this.iIN23.Text = "iIN23 - Aux EOB";
+            this.iIN23.UseVisualStyleBackColor = true;
             // 
             // barLength
             // 
@@ -693,56 +743,6 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
-            // controllerMode
-            // 
-            this.controllerMode.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.controllerMode.Location = new System.Drawing.Point(10, 163);
-            this.controllerMode.Name = "controllerMode";
-            this.controllerMode.Size = new System.Drawing.Size(175, 17);
-            this.controllerMode.TabIndex = 35;
-            this.controllerMode.Text = "Automatic Mode";
-            this.controllerMode.UseVisualStyleBackColor = true;
-            this.controllerMode.CheckedChanged += new System.EventHandler(this.controllerMode_CheckedChanged);
-            // 
-            // doorOpen
-            // 
-            this.doorOpen.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.doorOpen.Location = new System.Drawing.Point(10, 232);
-            this.doorOpen.Name = "doorOpen";
-            this.doorOpen.Size = new System.Drawing.Size(175, 17);
-            this.doorOpen.TabIndex = 36;
-            this.doorOpen.Text = "Door Open";
-            this.doorOpen.UseVisualStyleBackColor = true;
-            this.doorOpen.CheckedChanged += new System.EventHandler(this.doorOpen_CheckedChanged);
-            // 
-            // doorClosed
-            // 
-            this.doorClosed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.doorClosed.Location = new System.Drawing.Point(10, 254);
-            this.doorClosed.Name = "doorClosed";
-            this.doorClosed.Size = new System.Drawing.Size(175, 17);
-            this.doorClosed.TabIndex = 37;
-            this.doorClosed.Text = "Door Closed";
-            this.doorClosed.UseVisualStyleBackColor = true;
-            this.doorClosed.CheckedChanged += new System.EventHandler(this.doorClosed_CheckedChanged);
-            // 
-            // door
-            // 
-            this.door.Location = new System.Drawing.Point(317, 230);
-            this.door.Name = "door";
-            this.door.ReadOnly = true;
-            this.door.Size = new System.Drawing.Size(226, 20);
-            this.door.TabIndex = 39;
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(212, 232);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(55, 13);
-            this.label17.TabIndex = 38;
-            this.label17.Text = "DoorState";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -817,9 +817,7 @@
         private System.Windows.Forms.CheckBox changeFail;
         private System.Windows.Forms.TextBox barLength;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.TextBox newBar;
-        private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.CheckBox iTOPCUT;
+        private System.Windows.Forms.CheckBox iIN23;
         private System.Windows.Forms.TextBox mode;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label20;
@@ -831,6 +829,8 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.CheckBox doorClosed;
         private System.Windows.Forms.CheckBox doorOpen;
+        private System.Windows.Forms.TextBox auxEndOfBar;
+        private System.Windows.Forms.Label label18;
     }
 }
 
