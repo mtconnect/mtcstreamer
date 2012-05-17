@@ -39,7 +39,7 @@ namespace Streamer
         public bool iIN24 { get; set; }
         public bool iIN23 { get; set; }
         public bool iSPOK { get; set; }
-        public bool iCUCOK { get; set; }
+        public bool iCUC_B { get; set; }
         public bool iBFANML_B { get; set; }
         public bool LoadFail { get; set; }
         public bool ChangeFail { get; set; }
@@ -196,7 +196,7 @@ namespace Streamer
                     break;
 
                 case "ManualChuckUnclampInterlock":
-                    this.iCUCOK = element.Value == "UNLATCHED";
+                    this.iCUC_B = element.Value == "LATCHED";
                     this.BFManualChuck = element.Value;
                     break;
 
@@ -220,20 +220,12 @@ namespace Streamer
                 this.iMATADV = completed;
                 this.BFMaterialFeed = node.Value;
                 this.LoadFail = failed;
-                if (completed)
-                {
-                    //this.oMATADV = false;
-                }
             }
             else if (node.Name.LocalName == "MaterialChange")
             {
                 this.iMATCHG = completed;
                 this.BFMaterialChange = node.Value;
                 this.ChangeFail = failed;
-                if (completed)
-                {
-                    //this.oMATCHG = false;
-                }
             }
             else
             {
@@ -302,6 +294,8 @@ namespace Streamer
             this.iIN24 = false;
             this.iSPOK = false;
             this.iIN23 = false;
+            this.iCUC_B = false;
+            this.iIN23 = false;
             this.LoadFail = false;
             this.ChangeFail = false;
 
@@ -313,6 +307,8 @@ namespace Streamer
             this.BFMaterialChange = "";
             this.BFEmpty = "";
             this.BFSystem = "";
+            this.BFManualChuck = "";
+            this.BFAuxEndOfBar = "";
 
             WriteToAnyBus();
         }
@@ -328,8 +324,8 @@ namespace Streamer
             // Bit order
             // 0 - iIN23, 1 - iIN24, 2 - iBFANML_B, 3 - iMATCHG, 4 - iMATADV
             // 5 - iCUC_B, 6 - iSPOK, 7 - iNMCY, 8 - iNMCY_B, 9 - iMATRET
-            UInt32 reg = SetBit(1, iIN24) | SetBit(2, iBFANML_B) |
-                SetBit(3, iMATCHG) | SetBit(4, iMATADV) | SetBit(6, iSPOK) |
+            UInt32 reg = SetBit(1, iIN23) | SetBit(1, iIN24) | SetBit(2, iBFANML_B) |
+                SetBit(3, iMATCHG) | SetBit(4, iMATADV) | SetBit(6, iSPOK) | SetBit(5, iCUC_B) |
                 SetBit(8, iNMCY_B);
             Console.WriteLine("Input register value: 0x" + Convert.ToString((UInt16) reg, 16));
             iRegsiter = (UInt16) reg;

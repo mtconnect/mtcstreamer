@@ -69,6 +69,7 @@
             this.oBFCDM = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.iCUC_B = new System.Windows.Forms.CheckBox();
             this.bfExec = new System.Windows.Forms.TextBox();
             this.label23 = new System.Windows.Forms.Label();
             this.bfMode = new System.Windows.Forms.TextBox();
@@ -96,7 +97,6 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
-            this.iCUCOK = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -512,7 +512,7 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.iCUCOK);
+            this.groupBox3.Controls.Add(this.iCUC_B);
             this.groupBox3.Controls.Add(this.bfExec);
             this.groupBox3.Controls.Add(this.label23);
             this.groupBox3.Controls.Add(this.bfMode);
@@ -546,6 +546,16 @@
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Bar Feeder Status";
+            // 
+            // iCUC_B
+            // 
+            this.iCUC_B.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.iCUC_B.Location = new System.Drawing.Point(5, 180);
+            this.iCUC_B.Name = "iCUC_B";
+            this.iCUC_B.Size = new System.Drawing.Size(175, 17);
+            this.iCUC_B.TabIndex = 44;
+            this.iCUC_B.Text = "iCUC_B - Manual Chuck Inlk";
+            this.iCUC_B.UseVisualStyleBackColor = true;
             // 
             // bfExec
             // 
@@ -787,16 +797,6 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
-            // iCUCOK
-            // 
-            this.iCUCOK.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.iCUCOK.Location = new System.Drawing.Point(5, 180);
-            this.iCUCOK.Name = "iCUCOK";
-            this.iCUCOK.Size = new System.Drawing.Size(175, 17);
-            this.iCUCOK.TabIndex = 44;
-            this.iCUCOK.Text = "iCUCOK - Manual Chuck Inlk";
-            this.iCUCOK.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -889,7 +889,7 @@
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.TextBox bfMode;
         private System.Windows.Forms.Label label22;
-        private System.Windows.Forms.CheckBox iCUCOK;
+        private System.Windows.Forms.CheckBox iCUC_B;
     }
 }
 

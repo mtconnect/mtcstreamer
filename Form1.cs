@@ -115,7 +115,7 @@ namespace Streamer
             iIN24.Checked = mAnyBus.iIN24;
             iIN23.Checked = mAnyBus.iIN23;
             iSPOK.Checked = mAnyBus.iSPOK;
-            iCUCOK.Checked = mAnyBus.iCUCOK;
+            iCUC_B.Checked = mAnyBus.iCUC_B;
 
             // Update input text
             endOfBar.Text = mAnyBus.BFEndOfBar;
