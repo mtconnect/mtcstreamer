@@ -115,6 +115,7 @@ namespace Streamer
             iIN24.Checked = mAnyBus.iIN24;
             iIN23.Checked = mAnyBus.iIN23;
             iSPOK.Checked = mAnyBus.iSPOK;
+            iCUCOK.Checked = mAnyBus.iCUCOK;
 
             // Update input text
             endOfBar.Text = mAnyBus.BFEndOfBar;
@@ -125,6 +126,9 @@ namespace Streamer
             empty.Text = mAnyBus.BFEmpty;
             spindleInterlock.Text = mAnyBus.BFSpindleInterlock;
             barLength.Text = mAnyBus.BFLength;
+            bfMode.Text = mAnyBus.BFControllerMode;
+            bfExec.Text = mAnyBus.BFExecution;
+
             mode.Text = mAnyBus.Mode;
             door.Text = mAnyBus.DoorState;
 

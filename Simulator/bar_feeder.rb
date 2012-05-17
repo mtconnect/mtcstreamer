@@ -59,6 +59,7 @@ module BarFeeder
       @exec_di.value = 'READY'
       @mode_di.value = 'MANUAL'
       @end_of_bar_di.value = 'YES'
+      @aux_end_of_bar_di.value = 'NO'
       @spindle_interlock_di.value = 'UNLATCHED'
       @chuck_interlock_di.value = 'UNLATCHED'
       
@@ -94,6 +95,11 @@ module BarFeeder
       elsif @link_state == "ENABLED" and @faults.empty? and @chuck_open and
             @door_state == "CLOSED" and @controller_mode == "AUTOMATIC"
         puts "Becomming operational"
+        @adapter.gather do
+          @mode_di.value = 'AUTOMATIC'
+          @exec_di.value = 'ACTIVE'
+          @chuck_interlock_di.value = 'LATCHED'
+        end
         @statemachine.make_operational
       else
         puts "Still not ready"
@@ -106,16 +112,15 @@ module BarFeeder
         @material_feed_di.value = 'NOT_READY'
         @material_change_di.value = 'NOT_READY'
         @mode_di.value = 'MANUAL'
+        @exec_di.value = 'READY'
         @chuck_interlock_di.value = 'UNLATCHED'
         add_conditions
       end
     end
 
     def interfaces_ready
-      @chuck_interlock_di.value = 'LATCHED'
       if @remaining_length < @part_length
         @adapter.gather do 
-          @mode_di.value = 'AUTOMATIC'
           @material_feed_di.value = 'NOT_READY'
         end
         @statemachine.bar_finished
@@ -123,7 +128,6 @@ module BarFeeder
         @adapter.gather do 
           @material_feed_di.value = 'READY'
           @material_change_di.value = 'READY'
-          @mode_di.value = 'AUTOMATIC'
           add_conditions
         end
       end

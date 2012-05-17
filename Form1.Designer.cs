@@ -69,6 +69,10 @@
             this.oBFCDM = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.bfExec = new System.Windows.Forms.TextBox();
+            this.label23 = new System.Windows.Forms.Label();
+            this.bfMode = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
             this.auxEndOfBar = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.iIN23 = new System.Windows.Forms.CheckBox();
@@ -92,6 +96,7 @@
             this.iMATCHG = new System.Windows.Forms.CheckBox();
             this.iBFANML_B = new System.Windows.Forms.CheckBox();
             this.iIN24 = new System.Windows.Forms.CheckBox();
+            this.iCUCOK = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.stopOperation.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -507,6 +512,11 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.iCUCOK);
+            this.groupBox3.Controls.Add(this.bfExec);
+            this.groupBox3.Controls.Add(this.label23);
+            this.groupBox3.Controls.Add(this.bfMode);
+            this.groupBox3.Controls.Add(this.label22);
             this.groupBox3.Controls.Add(this.auxEndOfBar);
             this.groupBox3.Controls.Add(this.label18);
             this.groupBox3.Controls.Add(this.iIN23);
@@ -532,10 +542,44 @@
             this.groupBox3.Controls.Add(this.iIN24);
             this.groupBox3.Location = new System.Drawing.Point(12, 403);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(563, 214);
+            this.groupBox3.Size = new System.Drawing.Size(563, 273);
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Bar Feeder Status";
+            // 
+            // bfExec
+            // 
+            this.bfExec.Location = new System.Drawing.Point(317, 241);
+            this.bfExec.Name = "bfExec";
+            this.bfExec.ReadOnly = true;
+            this.bfExec.Size = new System.Drawing.Size(226, 20);
+            this.bfExec.TabIndex = 43;
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(207, 241);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(54, 13);
+            this.label23.TabIndex = 42;
+            this.label23.Text = "Execution";
+            // 
+            // bfMode
+            // 
+            this.bfMode.Location = new System.Drawing.Point(317, 215);
+            this.bfMode.Name = "bfMode";
+            this.bfMode.ReadOnly = true;
+            this.bfMode.Size = new System.Drawing.Size(226, 20);
+            this.bfMode.TabIndex = 41;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(207, 215);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(78, 13);
+            this.label22.TabIndex = 40;
+            this.label22.Text = "ControllerMode";
             // 
             // auxEndOfBar
             // 
@@ -743,11 +787,21 @@
             this.iIN24.Text = "iIN24 - End of Bar";
             this.iIN24.UseVisualStyleBackColor = true;
             // 
+            // iCUCOK
+            // 
+            this.iCUCOK.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.iCUCOK.Location = new System.Drawing.Point(5, 180);
+            this.iCUCOK.Name = "iCUCOK";
+            this.iCUCOK.Size = new System.Drawing.Size(175, 17);
+            this.iCUCOK.TabIndex = 44;
+            this.iCUCOK.Text = "iCUCOK - Manual Chuck Inlk";
+            this.iCUCOK.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(593, 629);
+            this.ClientSize = new System.Drawing.Size(593, 688);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
@@ -831,6 +885,11 @@
         private System.Windows.Forms.CheckBox doorOpen;
         private System.Windows.Forms.TextBox auxEndOfBar;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TextBox bfExec;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.TextBox bfMode;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.CheckBox iCUCOK;
     }
 }
 

@@ -39,6 +39,7 @@ namespace Streamer
         public bool iIN24 { get; set; }
         public bool iIN23 { get; set; }
         public bool iSPOK { get; set; }
+        public bool iCUCOK { get; set; }
         public bool iBFANML_B { get; set; }
         public bool LoadFail { get; set; }
         public bool ChangeFail { get; set; }
@@ -66,6 +67,9 @@ namespace Streamer
         public string BFLength { get; set; }
         public string BFEmpty { get; set; }
         public string BFSystem { get; set; }
+        public string BFControllerMode { get; set; }
+        public string BFExecution { get; set; }
+        public string BFManualChuck { get; set; }
 
         public string Mode { get { return mMode.Value; } }
         public string Feed { get { return mFeed.Value; } }
@@ -181,6 +185,19 @@ namespace Streamer
 
                 case "Length":
                     this.BFLength = element.Value;
+                    break;
+
+                case "ControllerMode":
+                    this.BFControllerMode = element.Value;
+                    break;
+
+                case "Execution":
+                    this.BFExecution = element.Value;
+                    break;
+
+                case "ManualChuckUnclampInterlock":
+                    this.iCUCOK = element.Value == "UNLATCHED";
+                    this.BFManualChuck = element.Value;
                     break;
 
                 default:
