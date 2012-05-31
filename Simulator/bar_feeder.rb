@@ -93,7 +93,7 @@ module BarFeeder
       if @mag_empty
         @statemachine.empty
       elsif @link_state == "ENABLED" and @faults.empty? and @chuck_open and
-            @door_state == "CLOSED" and @controller_mode == "AUTOMATIC"
+            @controller_mode == "AUTOMATIC"
         puts "Becomming operational"
         @adapter.gather do
           @mode_di.value = 'AUTOMATIC'
@@ -103,6 +103,9 @@ module BarFeeder
         @statemachine.make_operational
       else
         puts "Still not ready"
+        puts "\tLink State: #{@link_state}"
+        puts "\tFaults: #{@faults.length}"
+        puts "\tChuck Open: #{@chuck_open}"
         @statemachine.still_not_ready
       end
     end
@@ -227,12 +230,26 @@ module BarFeeder
         @material_feed_di.value = 'FAIL'
         add_conditions
       end
+      if (@material_feed == 'READY')
+        @adapter.gather do 
+          @material_feed_di.value = 'READY'
+          add_conditions
+        end
+        @statemachine.material_feed_ready
+      end
     end
   
     def material_change_failed
       @adapter.gather do 
         @material_change_di.value = 'FAIL'
         add_conditions
+      end
+      if (@material_change == 'READY')
+        @adapter.gather do 
+          @material_change_di.value = 'READY'
+          add_conditions
+        end
+        @statemachine.material_change_ready
       end
     end
     
@@ -275,7 +292,7 @@ module BarFeeder
           
           event :link_state_enabled, :activated
           event :normal, :activated
-          event :door_state_closed, :activated
+          # event :door_state_closed, :activated
           event :controller_mode_automatic, :activated
           
           event :material_feed_active, :load_fail
@@ -309,12 +326,16 @@ module BarFeeder
         default :load_fail
         on_entry :material_feed_failed
         event :material_feed_fail, :disabled_H
+        event :material_feed_ready, :activated, :disabled_H
+        event :material_feed_not_ready, :activated, :disabled_H
       end
 
       state :change_fail do
         default :change_fail
         on_entry :material_change_failed
         event :material_change_fail, :disabled_H
+        event :material_change_ready, :activated, :disabled_H
+        event :material_change_not_ready, :activated, :disabled_H
       end
   
       superstate :operational do
@@ -333,6 +354,7 @@ module BarFeeder
           complete = "#{interface}_complete".to_sym
           completed = "#{interface}_completed".to_sym
           ready = "#{interface}_ready".to_sym
+          not_ready = "#{interface}_not_ready".to_sym
           cnc_fail = "cnc_#{interface}_fail".to_sym
           
           trans :ready, active, interface
@@ -357,8 +379,10 @@ module BarFeeder
           # transition to a ready
           state fail do
             on_entry failed
-            default fail
             event fail, :activated, :reset_history
+            event ready, :activated, :reset_history
+            event not_ready, :activated, :reset_history
+            default fail
           end
     
           # Handle CNC failing current operation. We should
@@ -393,6 +417,8 @@ module BarFeeder
           on_entry :material_feed_failed
           default :material_feed_fail_eob
           event :material_feed_fail, :end_of_bar
+          event :material_feed_ready, :end_of_bar
+          event :material_feed_not_ready, :end_of_bar
         end
         
         # A few other states
