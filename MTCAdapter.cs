@@ -54,8 +54,15 @@ namespace MTConnect
         private TcpListener mListener;
         byte[] PONG;
         private ArrayList mDataItems = new ArrayList();
-        int mHeartbeat = 1000;
-        public int Heartbeat { get { return mHeartbeat; } set { mHeartbeat = value; } }
+        int mHeartbeat;
+        public int Heartbeat { 
+            get { return mHeartbeat; } 
+            set { 
+                mHeartbeat = value;
+                ASCIIEncoding encoder = new ASCIIEncoding();
+                PONG = encoder.GetBytes("* PONG " + mHeartbeat.ToString() + "\n");
+            } 
+        }
 
         private int mPort;
         public int Port
@@ -68,8 +75,7 @@ namespace MTConnect
         public MTCAdapter(int aPort = 7878)
         {
             mPort = aPort;
-            ASCIIEncoding encoder = new ASCIIEncoding();
-            PONG = encoder.GetBytes("* PONG " + mHeartbeat.ToString() + "\n");
+            Heartbeat = 1000;
         }
 
         public void AddDataItem(MTCDataItem aDI)
