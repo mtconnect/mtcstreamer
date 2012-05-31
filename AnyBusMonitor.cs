@@ -309,6 +309,8 @@ namespace Streamer
             this.BFSystem = "";
             this.BFManualChuck = "";
             this.BFAuxEndOfBar = "";
+            this.BFControllerMode = "";
+            this.BFExecution = "";
 
             WriteToAnyBus();
         }

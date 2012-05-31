@@ -62,7 +62,7 @@ namespace Streamer
         private void stopButton_Click(object sender, EventArgs e)
         {
             adapter.Stop();
-            stream.Stop();
+            stream.SignalToStop();
         }
 
         private void startButton_Click(object sender, EventArgs e)
@@ -72,8 +72,6 @@ namespace Streamer
 
             String b = url.Text;
             if (!b.EndsWith("/")) b = b + "/";
-
-            UpdateOutput();
 
             int heartbeat = 1000;
 
@@ -88,6 +86,8 @@ namespace Streamer
             adapter.Port = Convert.ToInt32(adapterPort.Text);
             adapter.Heartbeat = heartbeat;
             adapter.Start();
+
+            UpdateOutput();
         }
 
         // Update output status

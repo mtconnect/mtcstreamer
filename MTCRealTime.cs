@@ -409,228 +409,239 @@ namespace MTConnect
             byte[] mimeBoundry = new byte[] { 13, 10, 13, 10 };
             char[] crlf = new char[] { '\r', '\n' };
 
-            while (!stopEvent.WaitOne(0, true))
+            try
             {
-                // reset reload event
-                reloadEvent.Reset();
-
-                // HTTP web request
-                HttpWebRequest request = null;
-                // web responce
-                WebResponse response = null;
-                // stream for MTConnect downloading
-                Stream stream = null;
-                // boundary betweeen xml documents
-                byte[] boundary = null;
-                // length of boundary
-                int boundaryLen;
-
-                // read amounts and positions
-                int read, count = 0;
-                int start = 0, partLength = 0;
-                bool body = false;
-
-                // align
-                //  1 = searching for xml start
-                //  2 = searching for xml end
-
-                try
+                while (!stopEvent.WaitOne(0, true))
                 {
-                    // Perform a current and initialize the callback...
-                    Uri b = new Uri(source);
-                    string[] pathParts = b.AbsolutePath.Split('/');
-                    string device = "";
-                    if (pathParts.Length >= 2) 
-                        device = pathParts[1];
-                    string current = "http://" + b.Host + ":" + b.Port + "/" + device
-                         + "/current";
-                    HttpWebRequest curentRequest = (HttpWebRequest)WebRequest.Create(current);
-                    curentRequest.KeepAlive = false;
-                    // set timeout value for the request
-                    WebResponse curentResponse = curentRequest.GetResponse();
-                    StreamReader currentReader = new StreamReader(curentResponse.GetResponseStream());
-                    string doc = currentReader.ReadToEnd();
-                    XElement currentDoc = XElement.Parse(doc);
+                    // reset reload event
+                    reloadEvent.Reset();
 
-                    // Let's first check if this was our asset
-                    XNamespace currentNs = currentDoc.Name.Namespace;
-                    XElement currentHeader = currentDoc.Descendants(currentNs + "Header").First();
-                    String nextSequence = currentHeader.Attribute("nextSequence").Value;
+                    // HTTP web request
+                    HttpWebRequest request = null;
+                    // web responce
+                    WebResponse response = null;
+                    // stream for MTConnect downloading
+                    Stream stream = null;
+                    // boundary betweeen xml documents
+                    byte[] boundary = null;
+                    // length of boundary
+                    int boundaryLen;
 
-                    // Call the callback with the current data...
-                    DataEvent(this, new RealTimeEventArgs(doc));
+                    // read amounts and positions
+                    int read, count = 0;
+                    int start = 0, partLength = 0;
+                    bool body = false;
 
-                    // create request
-                    request = (HttpWebRequest)WebRequest.Create(source + "&from=" + nextSequence);
-                    request.KeepAlive = false;
-                    // set timeout value for the request
-                    request.Timeout = requestTimeout;
+                    // align
+                    //  1 = searching for xml start
+                    //  2 = searching for xml end
 
-                    // set connection group name
-                    if (useSeparateConnectionGroup)
-                        request.ConnectionGroupName = GetHashCode().ToString();
-
-                    // get response
-                    response = request.GetResponse();
-
-                    // check content type
-                    string contentType = response.ContentType;
-                    if (contentType.IndexOf("multipart/x-mixed-replace") == -1)
+                    try
                     {
-                        // Notify of error...
-                        /// ErrorEventArgs handler...
-                        request.Abort();
-                        request = null;
-                        response.Close();
-                        response = null;
+                        // Perform a current and initialize the callback...
+                        Uri b = new Uri(source);
+                        string[] pathParts = b.AbsolutePath.Split('/');
+                        string device = "";
+                        if (pathParts.Length >= 2)
+                            device = pathParts[1];
+                        string current = "http://" + b.Host + ":" + b.Port + "/" + device
+                             + "/current";
+                        HttpWebRequest curentRequest = (HttpWebRequest)WebRequest.Create(current);
+                        curentRequest.KeepAlive = false;
+                        // set timeout value for the request
+                        WebResponse curentResponse = curentRequest.GetResponse();
+                        StreamReader currentReader = new StreamReader(curentResponse.GetResponseStream());
+                        string doc = currentReader.ReadToEnd();
+                        XElement currentDoc = XElement.Parse(doc);
 
-                        // need to stop ?
-                        if (stopEvent.WaitOne(0, true))
-                            break;
-                        continue;
-                    }
+                        // Let's first check if this was our asset
+                        XNamespace currentNs = currentDoc.Name.Namespace;
+                        XElement currentHeader = currentDoc.Descendants(currentNs + "Header").First();
+                        String nextSequence = currentHeader.Attribute("nextSequence").Value;
 
-                    // get boundary
-                    ASCIIEncoding encoding = new ASCIIEncoding();
-                    boundary = encoding.GetBytes("--" + contentType.Substring(contentType.IndexOf("boundary=", 0) + 9));
-                    boundaryLen = boundary.Length;
+                        // Call the callback with the current data...
+                        DataEvent(this, new RealTimeEventArgs(doc));
 
-                    // This is just an example header to see if we should bother checking for a 
-                    // new chunk after we finish with what we have processed.
-                    int headerLen = "Content-type: text/xml\r\nContent-length: 12345\r\n\r\n".Length;
+                        // create request
+                        request = (HttpWebRequest)WebRequest.Create(source + "&from=" + nextSequence);
+                        request.KeepAlive = false;
+                        // set timeout value for the request
+                        request.Timeout = requestTimeout;
 
-                    // get response stream
-                    stream = response.GetResponseStream();
-                    stream.ReadTimeout = heartbeatTimeout;
+                        // set connection group name
+                        if (useSeparateConnectionGroup)
+                            request.ConnectionGroupName = GetHashCode().ToString();
 
-                    // loop
-                    while ((!stopEvent.WaitOne(0, true)) && (!reloadEvent.WaitOne(0, true)))
-                    {
-                        // Read the remaining size of the buffer or our standard chunk size.
-                        int readLength;
-                        if (bufSize - count < readSize)
-                            readLength = bufSize - count;
-                        else
-                            readLength = readSize;
+                        // get response
+                        response = request.GetResponse();
 
-                        // read next portion from stream
-                        if ((read = stream.Read(buffer, count, readLength)) == 0)
-                            throw new ApplicationException();
-
-                        count += read;
-
-                        // increment received bytes counter
-                        bytesReceived += read;
-                        bool needMoreData;
-
-                        do
+                        // check content type
+                        string contentType = response.ContentType;
+                        if (contentType.IndexOf("multipart/x-mixed-replace") == -1)
                         {
-                            // Always assume we need more data...
-                            needMoreData = true;
-                            if (!body && count - start > headerLen)
+                            // Notify of error...
+                            /// ErrorEventArgs handler...
+                            request.Abort();
+                            request = null;
+                            response.Close();
+                            response = null;
+
+                            // need to stop ?
+                            if (stopEvent.WaitOne(0, true))
+                                break;
+                            continue;
+                        }
+
+                        // get boundary
+                        ASCIIEncoding encoding = new ASCIIEncoding();
+                        boundary = encoding.GetBytes("--" + contentType.Substring(contentType.IndexOf("boundary=", 0) + 9));
+                        boundaryLen = boundary.Length;
+
+                        // This is just an example header to see if we should bother checking for a 
+                        // new chunk after we finish with what we have processed.
+                        int headerLen = "Content-type: text/xml\r\nContent-length: 12345\r\n\r\n".Length;
+
+                        // get response stream
+                        stream = response.GetResponseStream();
+                        stream.ReadTimeout = heartbeatTimeout;
+
+                        // loop
+                        while ((!stopEvent.WaitOne(0, true)) && (!reloadEvent.WaitOne(0, true)))
+                        {
+                            // Read the remaining size of the buffer or our standard chunk size.
+                            int readLength;
+                            if (bufSize - count < readSize)
+                                readLength = bufSize - count;
+                            else
+                                readLength = readSize;
+
+                            // read next portion from stream
+                            if ((read = stream.Read(buffer, count, readLength)) == 0)
+                                throw new ApplicationException();
+
+                            count += read;
+
+                            // increment received bytes counter
+                            bytesReceived += read;
+                            bool needMoreData;
+
+                            do
                             {
-                                // Find the mime boundry indicating the mime head
-                                int head = ByteArrayUtils.Find(buffer, boundary, start, count - start);
-                                if (head == -1)
-                                    Console.WriteLine("Framing error, boundary not found\n");
-                                else
+                                // Always assume we need more data...
+                                needMoreData = true;
+                                if (!body && count - start > headerLen)
                                 {
-                                    // Locate the end of the mime header.
-                                    start = head + boundaryLen + 2;
-                                    int ind = ByteArrayUtils.Find(buffer, mimeBoundry, start, count - start);
-                                    if (ind != -1)
+                                    // Find the mime boundry indicating the mime head
+                                    int head = ByteArrayUtils.Find(buffer, boundary, start, count - start);
+                                    if (head == -1)
+                                        Console.WriteLine("Framing error, boundary not found\n");
+                                    else
                                     {
-                                        // Parse the headers
-                                        string header = encoding.GetString(buffer, start, ind - start);
-                                        string[] headers = header.Split('\n');
-
-                                        // Find the part length.
-                                        partLength = 0;
-                                        foreach (string s in headers)
+                                        // Locate the end of the mime header.
+                                        start = head + boundaryLen + 2;
+                                        int ind = ByteArrayUtils.Find(buffer, mimeBoundry, start, count - start);
+                                        if (ind != -1)
                                         {
-                                            string[] headerParts = s.Split(':');
-                                            if (headerParts[0].ToLower() == "content-length")
-                                                partLength = Int32.Parse(headerParts[1]); // +boundaryLen;
-                                        }
+                                            // Parse the headers
+                                            string header = encoding.GetString(buffer, start, ind - start);
+                                            string[] headers = header.Split('\n');
 
-                                        // found XML start and skip leading <cr><nl><cr><nl>
-                                        start = ind + 4;
-                                        body = true;
+                                            // Find the part length.
+                                            partLength = 0;
+                                            foreach (string s in headers)
+                                            {
+                                                string[] headerParts = s.Split(':');
+                                                if (headerParts[0].ToLower() == "content-length")
+                                                    partLength = Int32.Parse(headerParts[1]); // +boundaryLen;
+                                            }
+
+                                            // found XML start and skip leading <cr><nl><cr><nl>
+                                            start = ind + 4;
+                                            body = true;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (body && partLength > 0 && (count - start) >= partLength)
-                            {
-                                // increment frames counter
-                                framesReceived++;
-
-                                // notify
-                                if (DataEvent != null)
+                                if (body && partLength > 0 && (count - start) >= partLength)
                                 {
-                                    // Boundary should be right at the end, lets check there first...
-                                    // Remember to skip back two characters for the final \r\n
-                                    string document = encoding.GetString(buffer, start, partLength - 2);
+                                    // increment frames counter
+                                    framesReceived++;
 
-                                    // notify client
-                                    DataEvent(this, new RealTimeEventArgs(document));
+                                    // notify
+                                    if (DataEvent != null)
+                                    {
+                                        // Boundary should be right at the end, lets check there first...
+                                        // Remember to skip back two characters for the final \r\n
+                                        string document = encoding.GetString(buffer, start, partLength - 2);
+
+                                        // notify client
+                                        DataEvent(this, new RealTimeEventArgs(document));
+                                    }
+
+                                    // shift array
+                                    int end = (start + partLength);
+                                    if (count - end > 0)
+                                        Array.Copy(buffer, end, buffer, 0, count - end);
+
+                                    count = count - end;
+                                    start = 0;
+                                    body = false;
+                                    partLength = 0;
+                                    needMoreData = count < headerLen;
                                 }
+                            } while (!needMoreData);
+                        }
+                    }
+                    catch (WebException exception)
+                    {
+                        // provide information to clients
+                        // wait for a while before the next try
+                        ConnectionEvent(this, new ErrorArgs(exception.ToString()));
+                        Thread.Sleep(1000);
+                    }
+                    catch (ApplicationException exception)
+                    {
+                        // wait for a while before the next try
+                        ConnectionEvent(this, new ErrorArgs(exception.ToString()));
+                        Thread.Sleep(1000);
+                    }
+                    catch (Exception exception)
+                    {
+                        ConnectionEvent(this, new ErrorArgs(exception.ToString()));
+                        Console.WriteLine("Execption occurred: {0}\n{1}", exception.Message, exception.StackTrace);
+                        Thread.Sleep(1000);
+                    }
+                    finally
+                    {
+                        // abort request
+                        if (request != null)
+                        {
+                            request.Abort();
+                            request = null;
+                        }
+                        // close response stream
+                        if (stream != null)
+                        {
+                            stream.Close();
+                            stream = null;
+                        }
+                        // close response
+                        if (response != null)
+                        {
+                            response.Close();
+                            response = null;
+                        }
+                    }
+                }
+            }
 
-                                // shift array
-                                int end = (start + partLength);
-                                if (count - end > 0)
-                                    Array.Copy(buffer, end, buffer, 0, count - end);
-
-                                count = count - end;
-                                start = 0;
-                                body = false;
-                                partLength = 0;
-                                needMoreData = count < headerLen;
-                            }
-                         } while (!needMoreData);
-                    }
-                }
-                catch (WebException exception)
-                {
-                    // provide information to clients
-                    // wait for a while before the next try
-                    ConnectionEvent(this, new ErrorArgs(exception.ToString()));
-                    Thread.Sleep(1000);
-                }
-                catch (ApplicationException exception)
-                {
-                    // wait for a while before the next try
-                    ConnectionEvent(this, new ErrorArgs(exception.ToString()));
-                    Thread.Sleep(1000);
-                }
-                catch (Exception exception)
-                {
-                    ConnectionEvent(this, new ErrorArgs(exception.ToString()));
-                    Console.WriteLine("Execption occurred: {0}\n{1}", exception.Message, exception.StackTrace);
-                    Thread.Sleep(1000);
-                }
-                finally
-                {
-                    // abort request
-                    if (request != null)
-                    {
-                        request.Abort();
-                        request = null;
-                    }
-                    // close response stream
-                    if (stream != null)
-                    {
-                        stream.Close();
-                        stream = null;
-                    }
-                    // close response
-                    if (response != null)
-                    {
-                        response.Close();
-                        response = null;
-                    }
-                }
-           }
+            finally
+            {
+                ConnectionEvent(this, new ErrorArgs("Stopped"));
+                thread = null;
+                stopEvent.Close();
+                reloadEvent.Close();
+            }
         }
     }
 }
