@@ -130,7 +130,7 @@ namespace MTConnect
 
         private void Receive(NetworkStream aClient, String aLine)
         {
-            if (aLine.StartsWith("* PING"))
+            if (aLine.StartsWith("* PING") && mHeartbeat > 0)
             {
                 lock (aClient)
                 {
@@ -145,7 +145,8 @@ namespace MTConnect
         {
             TcpClient tcpClient = (TcpClient)client;
             NetworkStream clientStream = tcpClient.GetStream();
-            clientStream.ReadTimeout = mHeartbeat * 2;
+            if (mHeartbeat > 0)
+                clientStream.ReadTimeout = mHeartbeat * 2;
             mClients.Add(clientStream);
 
             byte[] message = new byte[4096];
@@ -163,10 +164,10 @@ namespace MTConnect
                         //blocks until a client sends a message
                         bytesRead = clientStream.Read(message, length, 4096 - length);
                     }
-                    catch
+                    catch(Exception e)
                     {
                         //a socket error has occured
-                        Console.WriteLine("Heartbeat read exception");
+                        Console.WriteLine("Heartbeat read exception: " + e.Message);
                         break;
                     }
 
@@ -201,9 +202,9 @@ namespace MTConnect
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.WriteLine("Error during heartbeat");
+                Console.WriteLine("Error during heartbeat: " + e.Message);
             }
 
             tcpClient.Close();
@@ -231,9 +232,9 @@ namespace MTConnect
                     SendAllTo(client.GetStream());
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.WriteLine("Execption occurred waiting for connection");
+                Console.WriteLine("Execption occurred waiting for connection: " + e.Message);
                 mListener.Stop();
             }
         }
