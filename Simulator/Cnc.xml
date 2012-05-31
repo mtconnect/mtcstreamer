@@ -29,7 +29,7 @@
             <MaterialLoader name="material" id="ml2">
               <DataItems>
                 <!-- Interfaces -->
-                <DataItem type="MATERIAL_FEED" subType="REQUEST" category="EVENT" id="rlm" name="load" />
+                <DataItem type="MATERIAL_FEED" subType="REQUEST" category="EVENT" id="rlm" name="feed" />
                 <DataItem type="MATERIAL_CHANGE" subType="REQUEST" category="EVENT" id="rcm" name="change" />
                 <DataItem type="MATERIAL_RETRACT" subType="REQUEST" category="EVENT" id="rmr" name="retract" />
                 <DataItem type="PART_CHANGE" subType="REQUEST" category="EVENT" id="rpc" name="part_change" />
